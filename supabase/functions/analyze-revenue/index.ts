@@ -1,6 +1,5 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,13 +12,9 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-  const supabase = createClient(supabaseUrl, supabaseKey);
-
   try {
     const { analysisId, prompt, model, temperature, data } = await req.json();
-    console.log('Analyzing revenue data:', { analysisId, model, temperature });
+    console.log('Analyzing revenue data:', { analysisId, model, temperature, data });
 
     // Format the prompt with the user's data
     const formattedPrompt = prompt
@@ -29,20 +24,27 @@ serve(async (req) => {
 
     console.log('Sending request to OpenRouter with prompt:', formattedPrompt);
 
-    // Send request to OpenRouter
     const openrouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Authorization': `Bearer ${Deno.env.get('OPENROUTER_API_KEY')}`,
         'HTTP-Referer': 'https://lennonlabs.com',
+        'X-Title': 'Revenue Opportunity Finder',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: model || 'google/gemini-pro',
+        model: "google/gemini-2.0-flash-exp:free",
         messages: [
-          { role: 'user', content: formattedPrompt }
-        ],
-        temperature: temperature || 0.7,
+          {
+            role: "user",
+            content: [
+              {
+                type: "text",
+                text: formattedPrompt
+              }
+            ]
+          }
+        ]
       }),
     });
 
@@ -71,6 +73,10 @@ serve(async (req) => {
     }
 
     // Update the analysis in the database
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
     const { error: updateError } = await supabase
       .from('revenue_analyses')
       .update({ analysis: analysisContent })
@@ -81,7 +87,6 @@ serve(async (req) => {
       throw updateError;
     }
 
-    // Return the analysis content
     return new Response(JSON.stringify({ content: analysisContent }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
