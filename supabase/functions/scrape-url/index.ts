@@ -113,7 +113,7 @@ serve(async (req) => {
       .filter(sentence => sentence.trim().length > 0)
       .map(sentence => sentence.trim() + '.')
       .join('\n\n')
-      .substring(0, 2000); // Limit content length to 2000 characters
+      .substring(0, 20000); // Increased to 20,000 characters
 
     console.log('Successfully extracted content from URL');
 
