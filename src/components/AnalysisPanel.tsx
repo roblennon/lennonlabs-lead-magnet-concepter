@@ -56,9 +56,9 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
   }
 
   return (
-    <Card className="bg-white p-8 border-border/50">
+    <Card className="bg-white p-8 border-border/50 h-full">
       {isLoading ? (
-        <div className="flex flex-col items-center justify-center gap-4 py-8">
+        <div className="flex flex-col items-center justify-center h-full gap-4">
           <div className="relative">
             <div className="absolute inset-0 flex items-center justify-center">
               <Loader2 className="h-8 w-8 animate-spin text-primary" />
