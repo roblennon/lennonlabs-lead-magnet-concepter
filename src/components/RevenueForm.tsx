@@ -6,6 +6,7 @@ import { HelpRequestsField } from "./revenue-form/HelpRequestsField";
 import { SubmitButton } from "./revenue-form/SubmitButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { FormConfig } from "@/types/database";
 
 export type FormData = {
   email: string;
@@ -17,9 +18,10 @@ export type FormData = {
 interface RevenueFormProps {
   onSubmit: (data: FormData) => void;
   isLoading?: boolean;
+  config: FormConfig;
 }
 
-export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
+export function RevenueForm({ onSubmit, isLoading, config }: RevenueFormProps) {
   const [formData, setFormData] = useState<FormData>({
     email: "",
     offer: "",
@@ -76,29 +78,38 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
     onSubmit(formData);
   };
 
+  const { fields } = config;
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6 p-8">
       <EmailField 
         value={formData.email}
         onChange={(value) => setFormData({ ...formData, email: value })}
+        config={fields.email}
       />
       
       <OfferField
         value={formData.offer}
         onChange={(value) => setFormData({ ...formData, offer: value })}
+        config={fields.offer}
       />
       
       <RevenueSourceField
         value={formData.revenueSource}
         onChange={(value) => setFormData({ ...formData, revenueSource: value })}
+        config={fields.revenueSource}
       />
       
       <HelpRequestsField
         value={formData.helpRequests}
         onChange={(value) => setFormData({ ...formData, helpRequests: value })}
+        config={fields.helpRequests}
       />
       
-      <SubmitButton isLoading={isLoading} />
+      <SubmitButton 
+        isLoading={isLoading} 
+        config={config.buttonConfig}
+      />
     </form>
   );
 }

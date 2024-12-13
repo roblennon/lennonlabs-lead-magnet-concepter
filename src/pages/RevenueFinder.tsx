@@ -1,13 +1,53 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RevenueForm, FormData } from "@/components/RevenueForm";
 import { AnalysisPanel } from "@/components/AnalysisPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { FormConfig } from "@/types/database";
 
 const RevenueFinder = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [analysis, setAnalysis] = useState<string>();
+  const [formConfig, setFormConfig] = useState<FormConfig>();
   const { toast } = useToast();
+
+  useEffect(() => {
+    const fetchFormConfig = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('form_configs')
+          .select('*')
+          .eq('slug', 'revenue')
+          .eq('is_active', true)
+          .single();
+
+        if (error) throw error;
+        
+        // Transform the data to match our TypeScript interface
+        setFormConfig({
+          id: data.id,
+          slug: data.slug,
+          title: data.title,
+          description: data.description,
+          fields: data.fields,
+          buttonConfig: data.button_config,
+          promptId: data.prompt_id,
+          isActive: data.is_active,
+          createdAt: data.created_at,
+          updatedAt: data.updated_at,
+        });
+      } catch (error) {
+        console.error('Error fetching form config:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load form configuration.",
+          variant: "destructive",
+        });
+      }
+    };
+
+    fetchFormConfig();
+  }, [toast]);
 
   const handleSubmit = async (data: FormData) => {
     setIsLoading(true);
@@ -22,6 +62,7 @@ const RevenueFinder = () => {
           offer: data.offer,
           revenue_source: data.revenueSource,
           help_requests: data.helpRequests,
+          prompt_id: formConfig?.promptId
         })
         .select()
         .single();
@@ -68,14 +109,17 @@ const RevenueFinder = () => {
     }
   };
 
+  if (!formConfig) {
+    return null; // Or a loading state
+  }
+
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <header className="border-b border-border/30">
         <div className="container mx-auto px-8 py-8">
-          <h1 className="text-[2.5rem] font-bold text-primary mb-3">3-Minute Revenue Opportunity Finder</h1>
+          <h1 className="text-[2.5rem] font-bold text-primary mb-3">{formConfig.title}</h1>
           <p className="text-lg text-muted max-w-2xl leading-relaxed">
-            Drop in your website URL or paste your primary offer, and answer two quick questions.
-            Our AI analysis will identify your fastest path to increased revenue.
+            {formConfig.description}
           </p>
         </div>
       </header>
@@ -83,7 +127,11 @@ const RevenueFinder = () => {
       <main className="flex-1 container mx-auto px-8 py-8">
         <div className="grid md:grid-cols-2 gap-8">
           <div className="bg-card rounded-lg shadow-lg border border-border/30">
-            <RevenueForm onSubmit={handleSubmit} isLoading={isLoading} />
+            <RevenueForm 
+              onSubmit={handleSubmit} 
+              isLoading={isLoading}
+              config={formConfig}
+            />
           </div>
           <div className="bg-card rounded-lg shadow-lg border border-border/30">
             <AnalysisPanel isLoading={isLoading} analysis={analysis} />
