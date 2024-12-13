@@ -21,14 +21,21 @@ const RevenueFinder = () => {
           .eq('is_active', true)
           .single();
 
-        if (error) throw error;
+        if (error) {
+          console.error('Error fetching form config:', error);
+          throw error;
+        }
         
-        // Transform and validate the data to match our TypeScript interface
+        if (!data) {
+          throw new Error('No active form configuration found');
+        }
+
+        // Type assertions for the JSON fields
         const fields = data.fields as FormFields;
         const buttonConfig = data.button_config as ButtonConfig;
         
         if (!fields || !buttonConfig) {
-          throw new Error('Invalid form configuration');
+          throw new Error('Invalid form configuration structure');
         }
         
         setFormConfig({
@@ -44,10 +51,10 @@ const RevenueFinder = () => {
           updatedAt: data.updated_at,
         });
       } catch (error) {
-        console.error('Error fetching form config:', error);
+        console.error('Error:', error);
         toast({
           title: "Error",
-          description: "Failed to load form configuration.",
+          description: "Failed to load form configuration. Please try again later.",
           variant: "destructive",
         });
       }
