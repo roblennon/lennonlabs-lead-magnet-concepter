@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import RevenueForm from "@/components/RevenueForm";
+import { RevenueForm } from "@/components/RevenueForm";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { FormConfig, FormFields, ButtonConfig } from "@/types/database";
@@ -43,8 +43,8 @@ const RevenueFinder = () => {
           title: data.title,
           description: data.description,
           fields,
-          button_config: buttonConfig,
-          prompt_id: data.prompt_id,
+          buttonConfig,
+          promptId: data.prompt_id,
         });
       } catch (error) {
         console.error('Error fetching form config:', error);
@@ -122,7 +122,7 @@ const RevenueFinder = () => {
           offer: data.get('offer'),
           revenue_source: data.get('revenue_source'),
           help_requests: data.get('help_requests'),
-          prompt_id: formConfig?.prompt_id,
+          promptId: formConfig?.promptId,
         }),
       });
 
