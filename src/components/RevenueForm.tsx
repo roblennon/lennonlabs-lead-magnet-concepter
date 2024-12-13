@@ -6,7 +6,6 @@ import { HelpRequestsField } from "./revenue-form/HelpRequestsField";
 import { SubmitButton } from "./revenue-form/SubmitButton";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { FormConfig } from "@/types/database";
 
 export type FormData = {
   email: string;
@@ -18,10 +17,9 @@ export type FormData = {
 interface RevenueFormProps {
   onSubmit: (data: FormData) => void;
   isLoading?: boolean;
-  config: FormConfig;
 }
 
-export function RevenueForm({ onSubmit, isLoading, config }: RevenueFormProps) {
+export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
   const [formData, setFormData] = useState<FormData>({
     email: "",
     offer: "",
@@ -48,65 +46,59 @@ export function RevenueForm({ onSubmit, isLoading, config }: RevenueFormProps) {
         if (error) throw error;
         
         if (data.content) {
-          // Update the form data with the scraped content
-          setFormData(prev => ({
-            ...prev,
-            offer: data.content
-          }));
+          // Append the scraped content to any existing content
+          const updatedOffer = formData.offer + "\n\n" + data.content;
+          setFormData(prev => ({ ...prev, offer: updatedOffer }));
           
           toast({
             title: "Website content extracted",
             description: "Successfully analyzed your website content.",
           });
-          return; // Don't submit the form yet
+          
+          // Submit the form with the updated offer
+          onSubmit({
+            ...formData,
+            offer: updatedOffer
+          });
+          return;
         }
       } catch (error) {
         console.error('Error scraping URL:', error);
         toast({
           title: "Error",
-          description: "Failed to analyze website content. Please enter your offer manually.",
+          description: "Failed to analyze website content. Proceeding with form submission.",
           variant: "destructive",
         });
-        return; // Don't submit if there was an error
       }
     }
     
-    // Submit the form with current data
+    // If no URL or scraping failed, submit the form with current data
     onSubmit(formData);
   };
-
-  const { fields } = config;
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 p-8">
       <EmailField 
         value={formData.email}
         onChange={(value) => setFormData({ ...formData, email: value })}
-        config={fields.email}
       />
       
       <OfferField
         value={formData.offer}
         onChange={(value) => setFormData({ ...formData, offer: value })}
-        config={fields.offer}
       />
       
       <RevenueSourceField
         value={formData.revenueSource}
         onChange={(value) => setFormData({ ...formData, revenueSource: value })}
-        config={fields.revenueSource}
       />
       
       <HelpRequestsField
         value={formData.helpRequests}
         onChange={(value) => setFormData({ ...formData, helpRequests: value })}
-        config={fields.helpRequests}
       />
       
-      <SubmitButton 
-        isLoading={isLoading} 
-        config={config.buttonConfig}
-      />
+      <SubmitButton isLoading={isLoading} />
     </form>
   );
 }

@@ -1,56 +1,105 @@
-import { Link } from "react-router-dom";
-import { Card } from "@/components/ui/card";
-import { Zap } from "lucide-react";
+import { useState } from "react";
+import { RevenueForm, FormData } from "@/components/RevenueForm";
+import { AnalysisPanel } from "@/components/AnalysisPanel";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
+  const [isLoading, setIsLoading] = useState(false);
+  const [analysis, setAnalysis] = useState<string>();
+  const { toast } = useToast();
+
+  const handleSubmit = async (data: FormData) => {
+    setIsLoading(true);
+    setAnalysis(undefined);
+    
+    try {
+      // First, save the analysis request to the database
+      const { data: savedAnalysis, error: dbError } = await supabase
+        .from('revenue_analyses')
+        .insert({
+          email: data.email,
+          offer: data.offer,
+          revenue_source: data.revenueSource,
+          help_requests: data.helpRequests,
+        })
+        .select()
+        .single();
+
+      if (dbError) throw dbError;
+
+      // Get the active AI config
+      const { data: aiConfig, error: configError } = await supabase
+        .from('ai_configs')
+        .select()
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (configError) throw configError;
+
+      // Send data for analysis
+      const response = await supabase.functions.invoke('analyze-revenue', {
+        body: { 
+          analysisId: savedAnalysis.id,
+          prompt: aiConfig.prompt,
+          model: aiConfig.model,
+          temperature: aiConfig.temperature,
+          data
+        }
+      });
+
+      if (response.error) throw response.error;
+
+      // Handle the response data
+      if (response.data?.content) {
+        setAnalysis(response.data.content);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate analysis. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   return (
-    <div className="min-h-screen flex flex-col bg-[#1A1F2C]">
-      <header className="border-b border-[#9b87f5]/20">
-        <div className="container mx-auto px-8 py-12">
-          <img 
-            src="/lovable-uploads/03da23fe-9a53-4fbe-b9d9-1ee4f1589282.png" 
-            alt="Lennon Labs Logo" 
-            className="h-12 w-12 mb-6"
-          />
-          <h1 className="text-4xl font-bold text-white mb-4">
-            AI-Powered Tools for Entrepreneurs
-          </h1>
-          <p className="text-xl text-[#C8C8C9] max-w-2xl">
-            Discover our collection of specialized tools designed to help you grow your business faster.
+    <div className="min-h-screen flex flex-col bg-background">
+      <header className="border-b border-border/30">
+        <div className="container mx-auto px-8 py-8">
+          <h1 className="text-[2.5rem] font-bold text-primary mb-3">3-Minute Revenue Opportunity Finder</h1>
+          <p className="text-lg text-muted max-w-2xl leading-relaxed">
+            Drop in your website URL or paste your primary offer, and answer two quick questions.
+            Our AI analysis will identify your fastest path to increased revenue.
           </p>
         </div>
       </header>
 
-      <main className="flex-1 container mx-auto px-8 py-12">
-        <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-          <Link to="/revenue-finder" className="group">
-            <Card className="p-6 bg-white/5 border-[#9b87f5]/20 hover:border-[#9b87f5]/40 transition-all duration-300">
-              <div className="flex items-center gap-3 mb-4">
-                <div className="p-2 rounded-lg bg-[#9b87f5]/10 text-[#9b87f5]">
-                  <Zap className="h-5 w-5" />
-                </div>
-                <h2 className="text-xl font-semibold text-white">Revenue Opportunity Finder</h2>
-              </div>
-              <p className="text-[#C8C8C9] leading-relaxed">
-                Get personalized insights on your fastest path to increased revenue in just 3 minutes.
-              </p>
-            </Card>
-          </Link>
+      <main className="flex-1 container mx-auto px-8 py-8">
+        <div className="grid md:grid-cols-2 gap-8">
+          <div className="bg-card rounded-lg shadow-lg border border-border/30">
+            <RevenueForm onSubmit={handleSubmit} isLoading={isLoading} />
+          </div>
+          <div className="bg-card rounded-lg shadow-lg border border-border/30">
+            <AnalysisPanel isLoading={isLoading} analysis={analysis} />
+          </div>
         </div>
       </main>
 
-      <footer className="border-t border-[#9b87f5]/20 py-6">
+      <footer className="border-t border-border/30 py-6">
         <div className="container mx-auto px-8">
-          <div className="flex items-center justify-between">
-            <span className="text-sm text-[#8E9196]">© 2024 Lennon Labs. All rights reserved.</span>
-            <a 
-              href="https://lennonlabs.com" 
-              target="_blank" 
-              rel="noopener noreferrer"
-              className="text-sm text-[#9b87f5] hover:text-[#7E69AB] transition-colors"
-            >
-              lennonlabs.com
-            </a>
+          <div className="flex items-center space-x-3">
+            <img 
+              src="/lovable-uploads/03da23fe-9a53-4fbe-b9d9-1ee4f1589282.png" 
+              alt="Lennon Labs Logo" 
+              className="h-8 w-8"
+            />
+            <span className="text-sm text-muted">lennonlabs.com</span>
           </div>
         </div>
       </footer>
