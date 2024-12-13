@@ -54,6 +54,71 @@ export type Database = {
         }
         Relationships: []
       }
+      prompts: {
+        Row: {
+          content: string
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          name: string
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name: string
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          name?: string
+        }
+        Relationships: []
+      }
+      revenue_analyses: {
+        Row: {
+          analysis: string | null
+          created_at: string | null
+          email: string
+          help_requests: string
+          id: string
+          offer: string
+          prompt_id: string | null
+          revenue_source: string
+        }
+        Insert: {
+          analysis?: string | null
+          created_at?: string | null
+          email: string
+          help_requests: string
+          id?: string
+          offer: string
+          prompt_id?: string | null
+          revenue_source: string
+        }
+        Update: {
+          analysis?: string | null
+          created_at?: string | null
+          email?: string
+          help_requests?: string
+          id?: string
+          offer?: string
+          prompt_id?: string | null
+          revenue_source?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "revenue_analyses_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
