@@ -47,7 +47,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
 
   if (!analysis && !isLoading) {
     return (
-      <div className="flex items-center justify-center h-full text-[#333333] bg-white p-8">
+      <div className="flex items-center justify-center h-full text-foreground bg-card p-8">
         <p className="text-center text-base font-inter">
           Fill out the form to receive your personalized revenue opportunity analysis.
         </p>
@@ -56,7 +56,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
   }
 
   return (
-    <Card className="bg-white p-8 border-border/50 h-full">
+    <Card className="bg-card p-8 border-border/50 h-full">
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-full gap-4">
           <div className="relative">
@@ -65,7 +65,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
             </div>
             <div className="h-16 w-16 rounded-full border-4 border-muted animate-pulse" />
           </div>
-          <p className="text-base text-gray-600 animate-pulse font-inter">
+          <p className="text-base text-muted-foreground animate-pulse font-inter">
             Analyzing your business opportunities...
           </p>
         </div>
@@ -91,7 +91,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
               Export PDF
             </Button>
           </div>
-          <div id="analysis-content" className="prose prose-gray max-w-none font-inter text-gray-700">
+          <div id="analysis-content" className="prose max-w-none font-inter">
             <ReactMarkdown>{analysis}</ReactMarkdown>
           </div>
         </div>

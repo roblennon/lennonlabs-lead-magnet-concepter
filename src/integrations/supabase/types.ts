@@ -42,6 +42,53 @@ export type Database = {
         }
         Relationships: []
       }
+      form_configs: {
+        Row: {
+          button_config: Json
+          created_at: string | null
+          description: string
+          fields: Json
+          id: string
+          is_active: boolean | null
+          prompt_id: string | null
+          slug: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          button_config: Json
+          created_at?: string | null
+          description: string
+          fields: Json
+          id?: string
+          is_active?: boolean | null
+          prompt_id?: string | null
+          slug: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          button_config?: Json
+          created_at?: string | null
+          description?: string
+          fields?: Json
+          id?: string
+          is_active?: boolean | null
+          prompt_id?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "form_configs_prompt_id_fkey"
+            columns: ["prompt_id"]
+            isOneToOne: false
+            referencedRelation: "prompts"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       invoice_requests: {
         Row: {
           business_address: string | null
