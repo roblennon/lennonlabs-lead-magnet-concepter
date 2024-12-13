@@ -71,8 +71,8 @@ serve(async (req) => {
     // Format the prompt with the user's data
     const formattedPrompt = prompt
       .replace('{{offer}}', data.offer || '')
-      .replace('{{revenue_source}}', data.revenueSource || '')
-      .replace('{{help_requests}}', data.helpRequests || '');
+      .replace('{{revenueSource}}', data.revenueSource || '')
+      .replace('{{helpRequests}}', data.helpRequests || '');
 
     console.log('Formatted prompt with variables replaced:', formattedPrompt);
 
