@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { RevenueForm } from "@/components/RevenueForm";
+import { RevenueForm, FormData } from "@/components/RevenueForm";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { FormConfig, FormFields, ButtonConfig } from "@/types/database";
@@ -107,7 +107,7 @@ const RevenueFinder = () => {
     throw new Error('Invalid button configuration');
   };
 
-  const handleSubmit = async (data: FormData) => {
+  const handleSubmit = async (formData: FormData) => {
     setIsLoading(true);
     setAnalysis(undefined);
 
@@ -118,10 +118,10 @@ const RevenueFinder = () => {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          email: data.get('email'),
-          offer: data.get('offer'),
-          revenue_source: data.get('revenue_source'),
-          help_requests: data.get('help_requests'),
+          email: formData.email,
+          offer: formData.offer,
+          revenue_source: formData.revenueSource,
+          help_requests: formData.helpRequests,
           promptId: formConfig?.promptId,
         }),
       });
@@ -161,7 +161,6 @@ const RevenueFinder = () => {
         config={formConfig}
         onSubmit={handleSubmit}
         isLoading={isLoading}
-        analysis={analysis}
       />
     </div>
   );
