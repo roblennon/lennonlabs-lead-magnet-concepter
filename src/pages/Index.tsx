@@ -7,10 +7,14 @@ import { useToast } from "@/hooks/use-toast";
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [analysis, setAnalysis] = useState<string>();
+  const [stream, setStream] = useState<ReadableStream | undefined>();
   const { toast } = useToast();
 
   const handleSubmit = async (data: FormData) => {
     setIsLoading(true);
+    setAnalysis(undefined);
+    setStream(undefined);
+    
     try {
       // If the offer field contains a URL, scrape it first
       if (data.offer.startsWith('http') && data.offer.includes('.')) {
@@ -24,13 +28,18 @@ const Index = () => {
         }
       }
 
-      // Send data for analysis
-      const { data: response, error } = await supabase.functions.invoke('analyze-revenue', {
-        body: data
+      // Send data for analysis and get stream
+      const response = await supabase.functions.invoke('analyze-revenue', {
+        body: data,
+        headers: {
+          'Accept': 'text/event-stream',
+        },
       });
 
-      if (error) throw error;
-      setAnalysis(response.analysis);
+      if (response.error) throw response.error;
+
+      // Set the stream for the AnalysisPanel
+      setStream(response.data as ReadableStream);
     } catch (error) {
       console.error('Error:', error);
       toast({
@@ -61,7 +70,7 @@ const Index = () => {
             <RevenueForm onSubmit={handleSubmit} isLoading={isLoading} />
           </div>
           <div className="bg-card rounded-lg shadow-lg border border-border/30">
-            <AnalysisPanel isLoading={isLoading} analysis={analysis} />
+            <AnalysisPanel isLoading={isLoading} analysis={analysis} stream={stream} />
           </div>
         </div>
       </main>

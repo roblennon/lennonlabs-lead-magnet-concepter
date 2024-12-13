@@ -18,28 +18,32 @@ serve(async (req) => {
   try {
     const { email, offer, revenueSource, helpRequests } = await req.json()
 
-    // Create Supabase client with service role key for admin access
-    const supabaseAdmin = await fetch(`${SUPABASE_URL}/rest/v1/prompts?is_active=eq.true&order=created_at.desc&limit=1`, {
-      headers: {
-        'apikey': SUPABASE_SERVICE_ROLE_KEY,
-        'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-      },
-    });
+    // Fetch active prompt template
+    const promptResponse = await fetch(
+      `${SUPABASE_URL}/rest/v1/prompts?is_active=eq.true&order=created_at.desc&limit=1`,
+      {
+        headers: {
+          'apikey': SUPABASE_SERVICE_ROLE_KEY,
+          'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
+        },
+      }
+    )
     
-    const [activePrompt] = await supabaseAdmin.json();
+    const [activePrompt] = await promptResponse.json()
     
     if (!activePrompt) {
-      throw new Error('No active prompt template found');
+      throw new Error('No active prompt template found')
     }
 
     // Replace variables in the prompt template
     const prompt = activePrompt.content
       .replace('{{offer}}', offer)
       .replace('{{revenue_source}}', revenueSource)
-      .replace('{{help_requests}}', helpRequests);
+      .replace('{{help_requests}}', helpRequests)
 
-    console.log('Using prompt:', prompt);
+    console.log('Using prompt:', prompt)
 
+    // Create streaming response
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -52,40 +56,19 @@ serve(async (req) => {
         messages: [
           { role: 'user', content: prompt }
         ],
+        stream: true,
       }),
     })
 
-    const data = await response.json()
-    const analysis = data.choices[0].message.content
-
-    // Store the analysis in the database
-    const insertResponse = await fetch(`${SUPABASE_URL}/rest/v1/revenue_analyses`, {
-      method: 'POST',
+    // Return the stream directly to the client
+    return new Response(response.body, {
       headers: {
-        'apikey': SUPABASE_SERVICE_ROLE_KEY,
-        'Authorization': `Bearer ${SUPABASE_SERVICE_ROLE_KEY}`,
-        'Content-Type': 'application/json',
-        'Prefer': 'return=minimal',
+        ...corsHeaders,
+        'Content-Type': 'text/event-stream',
       },
-      body: JSON.stringify({
-        email,
-        offer,
-        revenue_source: revenueSource,
-        help_requests: helpRequests,
-        analysis,
-        prompt_id: activePrompt.id,
-      }),
-    });
-
-    if (!insertResponse.ok) {
-      throw new Error('Failed to store analysis');
-    }
-
-    return new Response(JSON.stringify({ analysis }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     })
   } catch (error) {
-    console.error('Error in analyze-revenue function:', error);
+    console.error('Error:', error)
     return new Response(JSON.stringify({ error: error.message }), {
       status: 500,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

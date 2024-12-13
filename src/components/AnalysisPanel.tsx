@@ -4,18 +4,65 @@ import { Copy, Download, Loader2 } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import { useToast } from "@/hooks/use-toast";
 import html2pdf from 'html2pdf.js';
+import { useEffect, useState } from "react";
 
 interface AnalysisPanelProps {
   isLoading?: boolean;
   analysis?: string;
+  stream?: ReadableStream;
 }
 
-export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
+export function AnalysisPanel({ isLoading, analysis, stream }: AnalysisPanelProps) {
   const { toast } = useToast();
+  const [streamedContent, setStreamedContent] = useState("");
+
+  useEffect(() => {
+    if (stream) {
+      const reader = stream.getReader();
+      const decoder = new TextDecoder();
+      let buffer = "";
+
+      const processStream = async () => {
+        try {
+          while (true) {
+            const { done, value } = await reader.read();
+            if (done) break;
+
+            const chunk = decoder.decode(value);
+            const lines = (buffer + chunk).split('\n');
+            buffer = lines.pop() || "";
+
+            for (const line of lines) {
+              if (line.startsWith('data: ')) {
+                const data = line.slice(6);
+                if (data === '[DONE]') continue;
+                try {
+                  const parsed = JSON.parse(data);
+                  const content = parsed.choices[0]?.delta?.content || '';
+                  setStreamedContent(prev => prev + content);
+                } catch (e) {
+                  console.error('Error parsing JSON:', e);
+                }
+              }
+            }
+          }
+        } catch (error) {
+          console.error('Error reading stream:', error);
+        }
+      };
+
+      processStream();
+      return () => {
+        reader.cancel();
+      };
+    }
+  }, [stream]);
+
+  const displayContent = streamedContent || analysis;
 
   const copyToClipboard = async () => {
-    if (analysis) {
-      await navigator.clipboard.writeText(analysis);
+    if (displayContent) {
+      await navigator.clipboard.writeText(displayContent);
       toast({
         title: "Copied!",
         description: "Analysis copied to clipboard",
@@ -24,7 +71,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
   };
 
   const exportToPDF = () => {
-    if (analysis) {
+    if (displayContent) {
       const element = document.getElementById('analysis-content');
       html2pdf()
         .set({
@@ -45,7 +92,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
     }
   };
 
-  if (!analysis && !isLoading) {
+  if (!displayContent && !isLoading) {
     return (
       <div className="flex items-center justify-center h-full text-foreground p-8">
         <p className="text-center text-base">
@@ -56,7 +103,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
   }
 
   return (
-    <Card className="bg-card p-8 border-border/50">
+    <Card className="bg-white p-8 border-border/50">
       {isLoading ? (
         <div className="flex flex-col items-center justify-center gap-4 py-8">
           <div className="relative">
@@ -65,7 +112,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
             </div>
             <div className="h-16 w-16 rounded-full border-4 border-muted animate-pulse" />
           </div>
-          <p className="text-base text-foreground animate-pulse">
+          <p className="text-base text-gray-600 animate-pulse">
             Analyzing your business opportunities...
           </p>
         </div>
@@ -91,8 +138,8 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
               Export PDF
             </Button>
           </div>
-          <div id="analysis-content" className="prose prose-invert max-w-none">
-            <ReactMarkdown>{analysis}</ReactMarkdown>
+          <div id="analysis-content" className="prose prose-gray max-w-none">
+            <ReactMarkdown>{displayContent}</ReactMarkdown>
           </div>
         </div>
       )}
