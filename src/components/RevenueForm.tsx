@@ -4,6 +4,7 @@ import { Label } from "./ui/label";
 import { RadioGroup, RadioGroupItem } from "./ui/radio-group";
 import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
+import { Send } from "lucide-react";
 
 export type FormData = {
   email: string;
@@ -109,6 +110,7 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
         disabled={isLoading}
       >
         {isLoading ? "Analyzing..." : "Generate Revenue Opportunities"}
+        {!isLoading && <Send className="ml-2" />}
       </Button>
     </form>
   );
