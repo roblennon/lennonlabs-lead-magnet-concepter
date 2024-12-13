@@ -1,6 +1,5 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,12 +12,6 @@ serve(async (req) => {
     return new Response(null, { headers: corsHeaders });
   }
 
-  const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-  const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-  const openrouterKey = Deno.env.get('OPENROUTER_API_KEY')!;
-  
-  const supabase = createClient(supabaseUrl, supabaseKey);
-
   try {
     const { analysisId, prompt, model, temperature, data } = await req.json();
     console.log('Analyzing revenue data:', { analysisId, model, temperature });
@@ -29,11 +22,13 @@ serve(async (req) => {
       .replace('{{revenue_source}}', data.revenueSource)
       .replace('{{help_requests}}', data.helpRequests);
 
+    console.log('Sending request to OpenRouter with prompt:', formattedPrompt);
+
     // Send request to OpenRouter
     const openrouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openrouterKey}`,
+        'Authorization': `Bearer ${Deno.env.get('OPENROUTER_API_KEY')}`,
         'HTTP-Referer': 'https://lennonlabs.com',
         'Content-Type': 'application/json',
       },
@@ -46,8 +41,27 @@ serve(async (req) => {
       }),
     });
 
+    if (!openrouterResponse.ok) {
+      const errorText = await openrouterResponse.text();
+      console.error('OpenRouter API error:', {
+        status: openrouterResponse.status,
+        statusText: openrouterResponse.statusText,
+        error: errorText
+      });
+      throw new Error(`OpenRouter API error: ${openrouterResponse.status} ${errorText}`);
+    }
+
     const result = await openrouterResponse.json();
-    const analysisContent = result.choices[0]?.message?.content || '';
+    console.log('OpenRouter API response:', result);
+
+    if (!result.choices || !result.choices.length) {
+      throw new Error('Invalid response from OpenRouter API: No choices returned');
+    }
+
+    const analysisContent = result.choices[0]?.message?.content;
+    if (!analysisContent) {
+      throw new Error('Invalid response from OpenRouter API: No content in response');
+    }
 
     // Update the analysis in the database
     const { error: updateError } = await supabase
@@ -55,7 +69,10 @@ serve(async (req) => {
       .update({ analysis: analysisContent })
       .eq('id', analysisId);
 
-    if (updateError) throw updateError;
+    if (updateError) {
+      console.error('Error updating analysis in database:', updateError);
+      throw updateError;
+    }
 
     // Return the analysis content
     return new Response(JSON.stringify({ content: analysisContent }), {
