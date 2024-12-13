@@ -1,38 +1,31 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 232 35% 14%;
-    --foreground: 0 0% 98%;
-
-    --card: 232 35% 18%;
-    --card-foreground: 0 0% 98%;
-
-    --popover: 232 35% 18%;
-    --popover-foreground: 0 0% 98%;
-
-    --primary: 55 92% 75%;
-    --primary-foreground: 232 35% 14%;
-
-    --secondary: 232 35% 20%;
-    --secondary-foreground: 0 0% 98%;
-
-    --muted: 232 35% 25%;
-    --muted-foreground: 215 20% 65%;
-
-    --accent: 55 92% 75%;
-    --accent-foreground: 232 35% 14%;
-
-    --destructive: 0 84% 60%;
+    --background: 260 15% 13%;
+    --foreground: 0 0% 100%;
+    --card: 260 8% 25%;
+    --card-foreground: 0 0% 100%;
+    --popover: 260 15% 13%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 53 95% 90%;
+    --primary-foreground: 260 15% 13%;
+    --secondary: 260 8% 25%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 0 0% 20%;
+    --muted-foreground: 220 3% 57%;
+    --accent: 53 95% 90%;
+    --accent-foreground: 260 15% 13%;
+    --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 0 0% 98%;
-
-    --border: 232 35% 24%;
-    --input: 232 35% 24%;
-    --ring: 55 92% 75%;
-
-    --radius: 0.5rem;
+    --border: 260 8% 25%;
+    --input: 260 8% 25%;
+    --ring: 53 95% 90%;
+    --radius: 0.75rem;
   }
 }
 
@@ -41,11 +34,10 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground font-inter;
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
   }
 }
-
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 .glass {
   background: rgba(27, 27, 33, 0.7);
@@ -60,9 +52,11 @@
 @keyframes fadeIn {
   from {
     opacity: 0;
+    transform: translateY(10px);
   }
   to {
     opacity: 1;
+    transform: translateY(0);
   }
 }
 
