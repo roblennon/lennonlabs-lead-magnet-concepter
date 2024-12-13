@@ -38,11 +38,11 @@ serve(async (req) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: model,
+        model: model || 'google/gemini-pro',
         messages: [
           { role: 'user', content: formattedPrompt }
         ],
-        temperature: temperature,
+        temperature: temperature || 0.7,
       }),
     });
 
@@ -59,12 +59,14 @@ serve(async (req) => {
     const result = await openrouterResponse.json();
     console.log('OpenRouter API response:', result);
 
-    if (!result.choices || !result.choices.length) {
+    if (!result.choices || !Array.isArray(result.choices) || result.choices.length === 0) {
+      console.error('Invalid OpenRouter response structure:', result);
       throw new Error('Invalid response from OpenRouter API: No choices returned');
     }
 
     const analysisContent = result.choices[0]?.message?.content;
     if (!analysisContent) {
+      console.error('No content in OpenRouter response:', result.choices[0]);
       throw new Error('Invalid response from OpenRouter API: No content in response');
     }
 
