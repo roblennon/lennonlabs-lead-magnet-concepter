@@ -1,31 +1,33 @@
 import { useState } from "react";
 import { RevenueForm, FormData } from "@/components/RevenueForm";
 import { AnalysisPanel } from "@/components/AnalysisPanel";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [analysis, setAnalysis] = useState<string>();
+  const { toast } = useToast();
 
   const handleSubmit = async (data: FormData) => {
     setIsLoading(true);
-    // Simulate API call
-    await new Promise((resolve) => setTimeout(resolve, 2000));
-    setAnalysis(
-      `Based on your inputs, here are your revenue opportunities:\n\n` +
-      `1. Quick Wins:\n` +
-      `• Optimize your ${data.revenueSource} offering\n` +
-      `• Create a streamlined onboarding process\n` +
-      `• Implement automated follow-ups\n\n` +
-      `2. Growth Opportunities:\n` +
-      `• Develop complementary products\n` +
-      `• Create strategic partnerships\n` +
-      `• Implement referral systems\n\n` +
-      `3. Next Steps:\n` +
-      `• Review your current pricing strategy\n` +
-      `• Analyze your customer journey\n` +
-      `• Identify automation opportunities`
-    );
-    setIsLoading(false);
+    try {
+      const { data: response, error } = await supabase.functions.invoke('analyze-revenue', {
+        body: data
+      });
+
+      if (error) throw error;
+      setAnalysis(response.analysis);
+    } catch (error) {
+      console.error('Error:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate analysis. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
