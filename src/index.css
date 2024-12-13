@@ -4,33 +4,33 @@
 
 @layer base {
   :root {
-    --background: 222 47% 11%;
-    --foreground: 0 0% 95%;
+    --background: 232 35% 14%;
+    --foreground: 0 0% 98%;
 
-    --card: 225 45% 12%;
-    --card-foreground: 0 0% 95%;
+    --card: 232 35% 18%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 225 45% 12%;
-    --popover-foreground: 0 0% 95%;
+    --popover: 232 35% 18%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 55 92% 95%;
-    --primary-foreground: 225 45% 12%;
+    --primary: 55 92% 75%;
+    --primary-foreground: 232 35% 14%;
 
-    --secondary: 225 45% 16%;
-    --secondary-foreground: 0 0% 95%;
+    --secondary: 232 35% 20%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 225 45% 16%;
-    --muted-foreground: 220 8% 70%;
+    --muted: 232 35% 25%;
+    --muted-foreground: 215 20% 65%;
 
-    --accent: 55 92% 95%;
-    --accent-foreground: 225 45% 12%;
+    --accent: 55 92% 75%;
+    --accent-foreground: 232 35% 14%;
 
     --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 95%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 225 45% 16%;
-    --input: 225 45% 16%;
-    --ring: 55 92% 85%;
+    --border: 232 35% 24%;
+    --input: 232 35% 24%;
+    --ring: 55 92% 75%;
 
     --radius: 0.5rem;
   }
@@ -41,12 +41,17 @@
     @apply border-border;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-inter;
   }
 }
 
+@font-face {
+  font-family: 'Inter';
+  src: url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+}
+
 .glass {
-  background: rgba(34, 31, 38, 0.7);
+  background: rgba(27, 27, 33, 0.7);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
