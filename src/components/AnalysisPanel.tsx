@@ -47,8 +47,8 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
 
   if (!analysis && !isLoading) {
     return (
-      <div className="flex items-center justify-center h-full text-foreground p-8">
-        <p className="text-center text-base font-inter text-gray-700">
+      <div className="flex items-center justify-center h-full text-[#333333] bg-white p-8">
+        <p className="text-center text-base font-inter">
           Fill out the form to receive your personalized revenue opportunity analysis.
         </p>
       </div>
