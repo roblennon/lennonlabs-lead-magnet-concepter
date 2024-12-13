@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.39.0';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,8 +14,8 @@ serve(async (req) => {
   }
 
   try {
-    const { analysisId, prompt, model, temperature, data } = await req.json();
-    console.log('Analyzing revenue data:', { analysisId, model, temperature, data });
+    const { analysisId, prompt, data } = await req.json();
+    console.log('Analyzing revenue data:', { analysisId, data });
 
     // Format the prompt with the user's data
     const formattedPrompt = prompt
@@ -37,12 +38,7 @@ serve(async (req) => {
         messages: [
           {
             role: "user",
-            content: [
-              {
-                type: "text",
-                text: formattedPrompt
-              }
-            ]
+            content: formattedPrompt
           }
         ]
       }),
@@ -61,16 +57,12 @@ serve(async (req) => {
     const result = await openrouterResponse.json();
     console.log('OpenRouter API response:', result);
 
-    if (!result.choices || !Array.isArray(result.choices) || result.choices.length === 0) {
+    if (!result.choices?.[0]?.message?.content) {
       console.error('Invalid OpenRouter response structure:', result);
-      throw new Error('Invalid response from OpenRouter API: No choices returned');
+      throw new Error('No valid content in OpenRouter response');
     }
 
-    const analysisContent = result.choices[0]?.message?.content;
-    if (!analysisContent) {
-      console.error('No content in OpenRouter response:', result.choices[0]);
-      throw new Error('Invalid response from OpenRouter API: No content in response');
-    }
+    const analysisContent = result.choices[0].message.content;
 
     // Update the analysis in the database
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
