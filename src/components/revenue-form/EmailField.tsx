@@ -18,7 +18,7 @@ export function EmailField({ value, onChange }: EmailFieldProps) {
         placeholder="Enter your email to receive the analysis"
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="h-12 bg-card border-border/50 text-foreground placeholder:text-muted/60"
+        className="h-12 bg-card border-border/50 text-foreground placeholder:text-muted/60 focus:bg-card"
         required
       />
     </div>

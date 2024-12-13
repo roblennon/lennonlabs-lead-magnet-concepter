@@ -91,8 +91,19 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
               Export PDF
             </Button>
           </div>
-          <div id="analysis-content" className="prose prose-gray max-w-none font-inter text-gray-700">
-            <ReactMarkdown>{analysis}</ReactMarkdown>
+          <div id="analysis-content" className="prose prose-gray max-w-none font-inter">
+            <ReactMarkdown 
+              components={{
+                h1: ({ children }) => <h1 className="text-3xl font-bold mb-4 text-primary">{children}</h1>,
+                h2: ({ children }) => <h2 className="text-2xl font-bold mb-3 text-primary">{children}</h2>,
+                h3: ({ children }) => <h3 className="text-xl font-bold mb-2 text-primary">{children}</h3>,
+                h4: ({ children }) => <h4 className="text-lg font-bold mb-2 text-primary">{children}</h4>,
+                strong: ({ children }) => <strong className="font-bold text-primary">{children}</strong>,
+                p: ({ children }) => <p className="mb-4 text-gray-700">{children}</p>,
+              }}
+            >
+              {analysis}
+            </ReactMarkdown>
           </div>
         </div>
       )}

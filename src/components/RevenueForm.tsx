@@ -36,7 +36,10 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Check if the offer field contains a URL
+    // Trigger loading state immediately
+    onSubmit(formData);
+    
+    // If there's a URL, scrape it after showing loading state
     if (isValidUrl(formData.offer)) {
       try {
         const { data, error } = await supabase.functions.invoke('scrape-url', {
@@ -55,12 +58,11 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
             description: "Successfully analyzed your website content.",
           });
           
-          // Submit the form with the updated offer
+          // Submit the form again with the updated offer
           onSubmit({
             ...formData,
             offer: updatedOffer
           });
-          return;
         }
       } catch (error) {
         console.error('Error scraping URL:', error);
@@ -71,9 +73,6 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
         });
       }
     }
-    
-    // If no URL or scraping failed, submit the form with current data
-    onSubmit(formData);
   };
 
   return (
