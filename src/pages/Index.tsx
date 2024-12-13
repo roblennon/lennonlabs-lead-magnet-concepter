@@ -41,15 +41,28 @@ const Index = () => {
       </header>
 
       <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="grid md:grid-cols-2 gap-6 h-[calc(100vh-240px)]">
-          <div className="bg-card rounded-lg shadow-lg overflow-auto border border-border/30">
+        <div className="grid md:grid-cols-2 gap-6">
+          <div className="bg-card rounded-lg shadow-lg border border-border/30">
             <RevenueForm onSubmit={handleSubmit} isLoading={isLoading} />
           </div>
-          <div className="bg-card rounded-lg shadow-lg overflow-hidden border border-border/30">
+          <div className="bg-card rounded-lg shadow-lg border border-border/30">
             <AnalysisPanel isLoading={isLoading} analysis={analysis} />
           </div>
         </div>
       </main>
+
+      <footer className="border-t border-border/30 py-6">
+        <div className="container mx-auto px-4 flex items-center">
+          <div className="flex items-center space-x-3">
+            <img 
+              src="/lovable-uploads/03da23fe-9a53-4fbe-b9d9-1ee4f1589282.png" 
+              alt="Lennon Labs Logo" 
+              className="h-8 w-8"
+            />
+            <span className="text-xs text-muted-foreground">lennonlabs.com</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };

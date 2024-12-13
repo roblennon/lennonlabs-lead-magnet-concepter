@@ -8,7 +8,7 @@ interface AnalysisPanelProps {
 export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
   if (!analysis && !isLoading) {
     return (
-      <div className="h-full flex items-center justify-center text-muted-foreground p-8">
+      <div className="flex items-center justify-center text-muted-foreground p-8">
         <p className="text-center text-sm">
           Fill out the form on the left to receive your personalized revenue opportunity analysis.
         </p>
@@ -17,9 +17,9 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
   }
 
   return (
-    <Card className="h-full overflow-auto bg-secondary/50 p-8 border-border/50">
+    <Card className="bg-secondary/50 p-8 border-border/50">
       {isLoading ? (
-        <div className="h-full flex items-center justify-center">
+        <div className="flex items-center justify-center">
           <div className="space-y-4 w-full max-w-md">
             <div className="h-4 bg-muted/50 rounded animate-pulse" />
             <div className="h-4 bg-muted/50 rounded animate-pulse w-5/6" />

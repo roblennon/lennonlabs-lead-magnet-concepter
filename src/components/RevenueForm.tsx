@@ -6,6 +6,7 @@ import { Textarea } from "./ui/textarea";
 import { Button } from "./ui/button";
 
 export type FormData = {
+  email: string;
   offer: string;
   revenueSource: string;
   helpRequests: string;
@@ -18,6 +19,7 @@ interface RevenueFormProps {
 
 export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
   const [formData, setFormData] = useState<FormData>({
+    email: "",
     offer: "",
     revenueSource: "services",
     helpRequests: "",
@@ -30,6 +32,21 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8 p-6">
+      <div className="space-y-3">
+        <Label htmlFor="email" className="text-sm font-medium text-muted-foreground">
+          Your email address
+        </Label>
+        <Input
+          id="email"
+          type="email"
+          placeholder="Enter your email to receive the analysis"
+          value={formData.email}
+          onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+          className="bg-secondary/50 border-border/50 h-11 text-foreground placeholder:text-muted-foreground/60"
+          required
+        />
+      </div>
+
       <div className="space-y-3">
         <Label htmlFor="offer" className="text-sm font-medium text-muted-foreground">
           Paste your website URL or main offer description
@@ -51,7 +68,7 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
         <RadioGroup
           value={formData.revenueSource}
           onValueChange={(value) => setFormData({ ...formData, revenueSource: value })}
-          className="space-y-3"
+          className="space-y-1.5"
         >
           <div className="flex items-center space-x-3">
             <RadioGroupItem value="services" id="services" className="border-primary/30 text-primary" />
