@@ -3,7 +3,7 @@ import { RevenueForm, FormData } from "@/components/RevenueForm";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { FormConfig, FormFields, ButtonConfig } from "@/types/database";
-import { Json } from "@/integrations/supabase/types";
+import { AnalysisPanel } from "@/components/AnalysisPanel";
 
 const RevenueFinder = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -112,26 +112,21 @@ const RevenueFinder = () => {
     setAnalysis(undefined);
 
     try {
-      const response = await fetch('/api/analyze-revenue', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('analyze-revenue', {
+        body: {
           email: formData.email,
           offer: formData.offer,
           revenue_source: formData.revenueSource,
           help_requests: formData.helpRequests,
           promptId: formConfig?.promptId,
-        }),
+        },
       });
 
-      if (!response.ok) {
-        throw new Error('Failed to analyze revenue opportunities');
+      if (error) {
+        throw error;
       }
 
-      const result = await response.json();
-      setAnalysis(result.analysis);
+      setAnalysis(data.analysis);
     } catch (error) {
       console.error('Error analyzing revenue:', error);
       toast({
@@ -153,15 +148,21 @@ const RevenueFinder = () => {
   }
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-2xl">
+    <div className="container mx-auto px-4 py-8 max-w-4xl">
       <h1 className="text-3xl font-bold text-center mb-8">{formConfig.title}</h1>
       <p className="text-gray-600 text-center mb-8">{formConfig.description}</p>
       
-      <RevenueForm
-        config={formConfig}
-        onSubmit={handleSubmit}
-        isLoading={isLoading}
-      />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        <RevenueForm
+          config={formConfig}
+          onSubmit={handleSubmit}
+          isLoading={isLoading}
+        />
+        <AnalysisPanel 
+          isLoading={isLoading}
+          analysis={analysis}
+        />
+      </div>
     </div>
   );
 };
