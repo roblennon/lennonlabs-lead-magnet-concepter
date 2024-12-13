@@ -9,6 +9,39 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      ai_configs: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          model: string
+          name: string
+          prompt: string
+          temperature: number
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          model?: string
+          name: string
+          prompt: string
+          temperature?: number
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          model?: string
+          name?: string
+          prompt?: string
+          temperature?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       invoice_requests: {
         Row: {
           business_address: string | null
