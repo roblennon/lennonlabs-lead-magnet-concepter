@@ -29,7 +29,7 @@ serve(async (req) => {
       .replace('{{revenue_source}}', data.revenueSource)
       .replace('{{help_requests}}', data.helpRequests);
 
-    // Create streaming response to OpenRouter
+    // Send request to OpenRouter
     const openrouterResponse = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -42,56 +42,26 @@ serve(async (req) => {
         messages: [
           { role: 'user', content: formattedPrompt }
         ],
-        stream: true,
         temperature: temperature,
       }),
     });
 
-    // Create a TransformStream to process the response chunks
-    const transformStream = new TransformStream({
-      async transform(chunk, controller) {
-        const text = new TextDecoder().decode(chunk);
-        controller.enqueue(text);
+    const result = await openrouterResponse.json();
+    const analysisContent = result.choices[0]?.message?.content || '';
 
-        // Try to parse the content from the chunk
-        const lines = text.split('\n');
-        for (const line of lines) {
-          if (line.startsWith('data: ')) {
-            const data = line.slice(6);
-            if (data === '[DONE]') continue;
-            try {
-              const parsed = JSON.parse(data);
-              const content = parsed.choices[0]?.delta?.content || '';
-              
-              // Update the analysis in the database with the new content
-              if (content) {
-                const { error } = await supabase
-                  .from('revenue_analyses')
-                  .update({ analysis: content })
-                  .eq('id', analysisId);
+    // Update the analysis in the database
+    const { error: updateError } = await supabase
+      .from('revenue_analyses')
+      .update({ analysis: analysisContent })
+      .eq('id', analysisId);
 
-                if (error) {
-                  console.error('Error updating analysis:', error);
-                }
-              }
-            } catch (e) {
-              console.error('Error parsing chunk:', e);
-            }
-          }
-        }
-      },
+    if (updateError) throw updateError;
+
+    // Return the analysis content
+    return new Response(JSON.stringify({ content: analysisContent }), {
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 
-    // Pipe the response through our transform stream
-    const responseStream = openrouterResponse.body!
-      .pipeThrough(transformStream);
-
-    return new Response(responseStream, {
-      headers: {
-        ...corsHeaders,
-        'Content-Type': 'text/event-stream',
-      },
-    });
   } catch (error) {
     console.error('Error in analyze-revenue function:', error);
     return new Response(JSON.stringify({ error: error.message }), {

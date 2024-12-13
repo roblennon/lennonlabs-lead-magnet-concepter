@@ -7,13 +7,11 @@ import { useToast } from "@/hooks/use-toast";
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [analysis, setAnalysis] = useState<string>();
-  const [streamContent, setStreamContent] = useState<string>("");
   const { toast } = useToast();
 
   const handleSubmit = async (data: FormData) => {
     setIsLoading(true);
     setAnalysis(undefined);
-    setStreamContent("");
     
     try {
       // First, save the analysis request to the database
@@ -55,8 +53,8 @@ const Index = () => {
       if (response.error) throw response.error;
 
       // Handle the response data
-      if (response.data) {
-        setStreamContent(response.data);
+      if (response.data?.content) {
+        setAnalysis(response.data.content);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -88,7 +86,7 @@ const Index = () => {
             <RevenueForm onSubmit={handleSubmit} isLoading={isLoading} />
           </div>
           <div className="bg-card rounded-lg shadow-lg border border-border/30">
-            <AnalysisPanel isLoading={isLoading} analysis={streamContent} />
+            <AnalysisPanel isLoading={isLoading} analysis={analysis} />
           </div>
         </div>
       </main>
