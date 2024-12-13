@@ -33,7 +33,7 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
   return (
     <form onSubmit={handleSubmit} className="space-y-6 p-8">
       <div className="space-y-2.5">
-        <Label htmlFor="email" className="text-base font-medium text-muted">
+        <Label htmlFor="email" className="text-base font-medium text-foreground">
           Your email address
         </Label>
         <Input
@@ -48,21 +48,21 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
       </div>
 
       <div className="space-y-2.5">
-        <Label htmlFor="offer" className="text-base font-medium text-muted">
+        <Label htmlFor="offer" className="text-base font-medium text-foreground">
           Paste your website URL or main offer description
         </Label>
-        <Input
+        <Textarea
           id="offer"
           placeholder="e.g. https://yourwebsite.com or describe your main offer"
           value={formData.offer}
           onChange={(e) => setFormData({ ...formData, offer: e.target.value })}
-          className="h-12 bg-card border-border/50 text-foreground placeholder:text-muted/60"
+          className="min-h-[120px] bg-card border-border/50 text-foreground placeholder:text-muted/60"
           required
         />
       </div>
 
       <div className="space-y-3">
-        <Label className="text-base font-medium text-muted">
+        <Label className="text-base font-medium text-foreground">
           What's currently making you the most money?
         </Label>
         <RadioGroup
@@ -71,26 +71,26 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
           className="space-y-0.75"
         >
           <div className="flex items-center space-x-3">
-            <RadioGroupItem value="services" id="services" className="border-primary/30 text-primary" />
-            <Label htmlFor="services" className="text-base font-normal">1:1 Services</Label>
+            <RadioGroupItem value="services" id="services" className="border-primary/30 text-muted" />
+            <Label htmlFor="services" className="text-base font-normal text-muted">1:1 Services</Label>
           </div>
           <div className="flex items-center space-x-3">
-            <RadioGroupItem value="products" id="products" className="border-primary/30 text-primary" />
-            <Label htmlFor="products" className="text-base font-normal">Digital Products</Label>
+            <RadioGroupItem value="products" id="products" className="border-primary/30 text-muted" />
+            <Label htmlFor="products" className="text-base font-normal text-muted">Digital Products</Label>
           </div>
           <div className="flex items-center space-x-3">
-            <RadioGroupItem value="programs" id="programs" className="border-primary/30 text-primary" />
-            <Label htmlFor="programs" className="text-base font-normal">Group Programs</Label>
+            <RadioGroupItem value="programs" id="programs" className="border-primary/30 text-muted" />
+            <Label htmlFor="programs" className="text-base font-normal text-muted">Group Programs</Label>
           </div>
           <div className="flex items-center space-x-3">
-            <RadioGroupItem value="other" id="other" className="border-primary/30 text-primary" />
-            <Label htmlFor="other" className="text-base font-normal">Other</Label>
+            <RadioGroupItem value="other" id="other" className="border-primary/30 text-muted" />
+            <Label htmlFor="other" className="text-base font-normal text-muted">Other</Label>
           </div>
         </RadioGroup>
       </div>
 
       <div className="space-y-2.5">
-        <Label htmlFor="helpRequests" className="text-base font-medium text-muted">
+        <Label htmlFor="helpRequests" className="text-base font-medium text-foreground">
           What do people most often ask you for help with?
         </Label>
         <Textarea

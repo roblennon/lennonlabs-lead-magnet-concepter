@@ -47,7 +47,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
 
   if (!analysis && !isLoading) {
     return (
-      <div className="flex items-center justify-center text-muted p-8">
+      <div className="flex items-center justify-center h-full text-foreground p-8">
         <p className="text-center text-base">
           Fill out the form to receive your personalized revenue opportunity analysis.
         </p>
@@ -65,7 +65,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
             </div>
             <div className="h-16 w-16 rounded-full border-4 border-muted animate-pulse" />
           </div>
-          <p className="text-base text-muted animate-pulse">
+          <p className="text-base text-foreground animate-pulse">
             Analyzing your business opportunities...
           </p>
         </div>
