@@ -16,21 +16,40 @@ const Index = () => {
     setStream(undefined);
     
     try {
-      // If the offer field contains a URL, scrape it first
-      if (data.offer.startsWith('http') && data.offer.includes('.')) {
-        const { data: scrapedData, error: scrapeError } = await supabase.functions.invoke('scrape-url', {
-          body: { url: data.offer }
-        });
+      // First, save the analysis request to the database
+      const { data: savedAnalysis, error: dbError } = await supabase
+        .from('revenue_analyses')
+        .insert({
+          email: data.email,
+          offer: data.offer,
+          revenue_source: data.revenueSource,
+          help_requests: data.helpRequests,
+        })
+        .select()
+        .single();
 
-        if (scrapeError) throw scrapeError;
-        if (scrapedData.content) {
-          data.offer = scrapedData.content;
-        }
-      }
+      if (dbError) throw dbError;
+
+      // Get the active AI config
+      const { data: aiConfig, error: configError } = await supabase
+        .from('ai_configs')
+        .select()
+        .eq('is_active', true)
+        .order('created_at', { ascending: false })
+        .limit(1)
+        .single();
+
+      if (configError) throw configError;
 
       // Send data for analysis and get stream
       const response = await supabase.functions.invoke('analyze-revenue', {
-        body: data,
+        body: { 
+          analysisId: savedAnalysis.id,
+          prompt: aiConfig.prompt,
+          model: aiConfig.model,
+          temperature: aiConfig.temperature,
+          data
+        },
         headers: {
           'Accept': 'text/event-stream',
         },
