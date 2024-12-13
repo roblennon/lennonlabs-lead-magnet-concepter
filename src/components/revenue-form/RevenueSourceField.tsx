@@ -1,38 +1,39 @@
 import { Label } from "../ui/label";
 import { RadioGroup, RadioGroupItem } from "../ui/radio-group";
+import { FormField } from "@/types/database";
 
 interface RevenueSourceFieldProps {
   value: string;
   onChange: (value: string) => void;
+  config: FormField;
 }
 
-export function RevenueSourceField({ value, onChange }: RevenueSourceFieldProps) {
+export function RevenueSourceField({ value, onChange, config }: RevenueSourceFieldProps) {
   return (
     <div className="space-y-3">
       <Label className="text-base font-medium text-foreground">
-        What's currently making you the most money?
+        {config.label}
       </Label>
       <RadioGroup
         value={value}
         onValueChange={onChange}
         className="space-y-0.75"
       >
-        <div className="flex items-center space-x-3">
-          <RadioGroupItem value="services" id="services" className="border-primary/30 text-muted" />
-          <Label htmlFor="services" className="text-base font-normal text-muted">1:1 Services</Label>
-        </div>
-        <div className="flex items-center space-x-3">
-          <RadioGroupItem value="products" id="products" className="border-primary/30 text-muted" />
-          <Label htmlFor="products" className="text-base font-normal text-muted">Digital Products</Label>
-        </div>
-        <div className="flex items-center space-x-3">
-          <RadioGroupItem value="programs" id="programs" className="border-primary/30 text-muted" />
-          <Label htmlFor="programs" className="text-base font-normal text-muted">Group Programs</Label>
-        </div>
-        <div className="flex items-center space-x-3">
-          <RadioGroupItem value="other" id="other" className="border-primary/30 text-muted" />
-          <Label htmlFor="other" className="text-base font-normal text-muted">Other</Label>
-        </div>
+        {config.options?.map((option) => (
+          <div key={option.value} className="flex items-center space-x-3">
+            <RadioGroupItem 
+              value={option.value} 
+              id={option.value} 
+              className="border-primary/30 text-muted" 
+            />
+            <Label 
+              htmlFor={option.value} 
+              className="text-base font-normal text-muted"
+            >
+              {option.label}
+            </Label>
+          </div>
+        ))}
       </RadioGroup>
     </div>
   );

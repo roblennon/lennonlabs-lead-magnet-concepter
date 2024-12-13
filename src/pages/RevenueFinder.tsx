@@ -3,7 +3,7 @@ import { RevenueForm, FormData } from "@/components/RevenueForm";
 import { AnalysisPanel } from "@/components/AnalysisPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import { FormConfig } from "@/types/database";
+import { FormConfig, FormFields, ButtonConfig } from "@/types/database";
 
 const RevenueFinder = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -23,14 +23,21 @@ const RevenueFinder = () => {
 
         if (error) throw error;
         
-        // Transform the data to match our TypeScript interface
+        // Transform and validate the data to match our TypeScript interface
+        const fields = data.fields as FormFields;
+        const buttonConfig = data.button_config as ButtonConfig;
+        
+        if (!fields || !buttonConfig) {
+          throw new Error('Invalid form configuration');
+        }
+        
         setFormConfig({
           id: data.id,
           slug: data.slug,
           title: data.title,
           description: data.description,
-          fields: data.fields,
-          buttonConfig: data.button_config,
+          fields,
+          buttonConfig,
           promptId: data.prompt_id,
           isActive: data.is_active,
           createdAt: data.created_at,
@@ -110,7 +117,14 @@ const RevenueFinder = () => {
   };
 
   if (!formConfig) {
-    return null; // Or a loading state
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-foreground mb-2">Loading...</h2>
+          <p className="text-muted">Please wait while we load the form configuration.</p>
+        </div>
+      </div>
+    );
   }
 
   return (
