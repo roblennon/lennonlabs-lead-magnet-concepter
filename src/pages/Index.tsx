@@ -33,17 +33,17 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <header className="border-b border-border/30">
-        <div className="container mx-auto px-4 py-8">
-          <h1 className="text-2xl font-semibold text-primary mb-3">3-Minute Revenue Opportunity Finder</h1>
-          <p className="text-muted-foreground text-sm max-w-2xl">
+        <div className="container mx-auto px-8 py-8">
+          <h1 className="text-[2.5rem] font-bold text-primary mb-3">3-Minute Revenue Opportunity Finder</h1>
+          <p className="text-lg text-muted max-w-2xl leading-relaxed">
             Drop in your website URL or paste your primary offer, and answer two quick questions.
             Our AI analysis will identify your fastest path to increased revenue.
           </p>
         </div>
       </header>
 
-      <main className="flex-1 container mx-auto px-4 py-8">
-        <div className="grid md:grid-cols-2 gap-6">
+      <main className="flex-1 container mx-auto px-8 py-8">
+        <div className="grid md:grid-cols-2 gap-8">
           <div className="bg-card rounded-lg shadow-lg border border-border/30">
             <RevenueForm onSubmit={handleSubmit} isLoading={isLoading} />
           </div>
@@ -54,14 +54,14 @@ const Index = () => {
       </main>
 
       <footer className="border-t border-border/30 py-6">
-        <div className="container mx-auto px-4 flex items-center">
+        <div className="container mx-auto px-8">
           <div className="flex items-center space-x-3">
             <img 
               src="/lovable-uploads/03da23fe-9a53-4fbe-b9d9-1ee4f1589282.png" 
               alt="Lennon Labs Logo" 
               className="h-8 w-8"
             />
-            <span className="text-xs text-muted-foreground">lennonlabs.com</span>
+            <span className="text-sm text-muted">lennonlabs.com</span>
           </div>
         </div>
       </footer>

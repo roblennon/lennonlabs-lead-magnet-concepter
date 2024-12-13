@@ -47,16 +47,16 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
 
   if (!analysis && !isLoading) {
     return (
-      <div className="flex items-center justify-center text-muted-foreground p-8">
-        <p className="text-center text-sm">
-          Fill out the form on the left to receive your personalized revenue opportunity analysis.
+      <div className="flex items-center justify-center text-muted p-8">
+        <p className="text-center text-base">
+          Fill out the form to receive your personalized revenue opportunity analysis.
         </p>
       </div>
     );
   }
 
   return (
-    <Card className="bg-secondary/50 p-8 border-border/50">
+    <Card className="bg-card p-8 border-border/50">
       {isLoading ? (
         <div className="flex flex-col items-center justify-center gap-4 py-8">
           <div className="relative">
@@ -65,7 +65,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
             </div>
             <div className="h-16 w-16 rounded-full border-4 border-muted animate-pulse" />
           </div>
-          <p className="text-sm text-muted-foreground animate-pulse">
+          <p className="text-base text-muted animate-pulse">
             Analyzing your business opportunities...
           </p>
         </div>
@@ -75,19 +75,19 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
             <Button
               variant="outline"
               size="sm"
-              className="text-xs"
+              className="text-sm"
               onClick={copyToClipboard}
             >
-              <Copy className="h-3 w-3 mr-1" />
+              <Copy className="h-4 w-4 mr-1" />
               Copy
             </Button>
             <Button
               variant="outline"
               size="sm"
-              className="text-xs"
+              className="text-sm"
               onClick={exportToPDF}
             >
-              <Download className="h-3 w-3 mr-1" />
+              <Download className="h-4 w-4 mr-1" />
               Export PDF
             </Button>
           </div>

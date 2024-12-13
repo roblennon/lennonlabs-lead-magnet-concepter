@@ -1,0 +1,43 @@
+Color Palette
+-------------
+Background Colors:
+- Primary Background: #1C1B20 (Dark, near-black with subtle purple hue)
+- Form Field Background: #2C2A30 (Dark gray)
+
+Text Colors:
+- Primary Text: #FFFFFF (White)
+- Secondary/Placeholder Text: #BDBDBD (Light gray)
+- Accent Text: #EACF57 (Warm yellow/gold)
+
+UI Elements:
+- Button Background: #F1C40F (Bright gold)
+- Button Text: #000000 (Black)
+- Form Field Borders/Lines: #3E3A45 (Very dark gray)
+- Logo Icon: #F1C40F (Bright gold)
+- Heart Icon: #FF0000 (Bright red)
+
+Typography
+----------
+Font Family: Inter, "Helvetica Neue", Arial, sans-serif
+
+Font Weights:
+- Headings: Bold (700)
+- Body: Normal (400)
+
+Font Sizes:
+- Main Heading: 2.5rem (40px)
+- Subheading: 2rem (32px)
+- Body Text/Instructions: 1rem to 1.125rem (16-18px)
+- Form Labels/Inputs: 1rem (16px)
+- Line Height: 1.5
+
+Layout & Spacing
+---------------
+- Container Padding: 2rem (32px)
+- Form Fields Vertical Spacing: 1rem (16px)
+- Section Margins: 2rem (32px)
+
+Branding
+--------
+Logo: Black square with stylized "L" in accent gold (#F1C40F)
+Theme: Dark, modern, minimalistic with warm gold accents

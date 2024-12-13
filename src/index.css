@@ -4,33 +4,33 @@
 
 @layer base {
   :root {
-    --background: 232 35% 14%;
-    --foreground: 0 0% 98%;
+    --background: 240 9% 11%;
+    --foreground: 0 0% 100%;
 
-    --card: 232 35% 18%;
-    --card-foreground: 0 0% 98%;
+    --card: 240 9% 18%;
+    --card-foreground: 0 0% 100%;
 
-    --popover: 232 35% 18%;
-    --popover-foreground: 0 0% 98%;
+    --popover: 240 9% 18%;
+    --popover-foreground: 0 0% 100%;
 
-    --primary: 55 92% 75%;
-    --primary-foreground: 232 35% 14%;
+    --primary: 47 88% 50%;
+    --primary-foreground: 0 0% 0%;
 
-    --secondary: 232 35% 20%;
-    --secondary-foreground: 0 0% 98%;
+    --secondary: 240 9% 18%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 232 35% 25%;
-    --muted-foreground: 215 20% 65%;
+    --muted: 240 5% 74%;
+    --muted-foreground: 240 5% 74%;
 
-    --accent: 55 92% 75%;
-    --accent-foreground: 232 35% 14%;
+    --accent: 47 88% 63%;
+    --accent-foreground: 0 0% 0%;
 
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 98%;
+    --destructive: 0 100% 50%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 232 35% 24%;
-    --input: 232 35% 24%;
-    --ring: 55 92% 75%;
+    --border: 252 8% 25%;
+    --input: 252 8% 25%;
+    --ring: 47 88% 50%;
 
     --radius: 0.5rem;
   }
@@ -48,9 +48,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 .glass {
-  background: rgba(27, 27, 33, 0.7);
+  background: rgba(44, 42, 48, 0.7);
   backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(62, 58, 69, 0.3);
 }
 
 .fade-in {

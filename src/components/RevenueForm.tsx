@@ -31,9 +31,9 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-8 p-6">
-      <div className="space-y-3">
-        <Label htmlFor="email" className="text-sm font-medium text-muted-foreground">
+    <form onSubmit={handleSubmit} className="space-y-6 p-8">
+      <div className="space-y-2.5">
+        <Label htmlFor="email" className="text-base font-medium text-muted">
           Your email address
         </Label>
         <Input
@@ -42,13 +42,13 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
           placeholder="Enter your email to receive the analysis"
           value={formData.email}
           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-          className="bg-secondary/50 border-border/50 h-11 text-foreground placeholder:text-muted-foreground/60"
+          className="h-12 bg-card border-border/50 text-foreground placeholder:text-muted/60"
           required
         />
       </div>
 
-      <div className="space-y-3">
-        <Label htmlFor="offer" className="text-sm font-medium text-muted-foreground">
+      <div className="space-y-2.5">
+        <Label htmlFor="offer" className="text-base font-medium text-muted">
           Paste your website URL or main offer description
         </Label>
         <Input
@@ -56,41 +56,41 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
           placeholder="e.g. https://yourwebsite.com or describe your main offer"
           value={formData.offer}
           onChange={(e) => setFormData({ ...formData, offer: e.target.value })}
-          className="bg-secondary/50 border-border/50 h-11 text-foreground placeholder:text-muted-foreground/60"
+          className="h-12 bg-card border-border/50 text-foreground placeholder:text-muted/60"
           required
         />
       </div>
 
-      <div className="space-y-4">
-        <Label className="text-sm font-medium text-muted-foreground">
+      <div className="space-y-3">
+        <Label className="text-base font-medium text-muted">
           What's currently making you the most money?
         </Label>
         <RadioGroup
           value={formData.revenueSource}
           onValueChange={(value) => setFormData({ ...formData, revenueSource: value })}
-          className="space-y-1.5"
+          className="space-y-0.75"
         >
           <div className="flex items-center space-x-3">
             <RadioGroupItem value="services" id="services" className="border-primary/30 text-primary" />
-            <Label htmlFor="services" className="text-sm font-normal">1:1 Services</Label>
+            <Label htmlFor="services" className="text-base font-normal">1:1 Services</Label>
           </div>
           <div className="flex items-center space-x-3">
             <RadioGroupItem value="products" id="products" className="border-primary/30 text-primary" />
-            <Label htmlFor="products" className="text-sm font-normal">Digital Products</Label>
+            <Label htmlFor="products" className="text-base font-normal">Digital Products</Label>
           </div>
           <div className="flex items-center space-x-3">
             <RadioGroupItem value="programs" id="programs" className="border-primary/30 text-primary" />
-            <Label htmlFor="programs" className="text-sm font-normal">Group Programs</Label>
+            <Label htmlFor="programs" className="text-base font-normal">Group Programs</Label>
           </div>
           <div className="flex items-center space-x-3">
             <RadioGroupItem value="other" id="other" className="border-primary/30 text-primary" />
-            <Label htmlFor="other" className="text-sm font-normal">Other</Label>
+            <Label htmlFor="other" className="text-base font-normal">Other</Label>
           </div>
         </RadioGroup>
       </div>
 
-      <div className="space-y-3">
-        <Label htmlFor="helpRequests" className="text-sm font-medium text-muted-foreground">
+      <div className="space-y-2.5">
+        <Label htmlFor="helpRequests" className="text-base font-medium text-muted">
           What do people most often ask you for help with?
         </Label>
         <Textarea
@@ -98,14 +98,14 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
           placeholder="Share the common questions or requests you receive..."
           value={formData.helpRequests}
           onChange={(e) => setFormData({ ...formData, helpRequests: e.target.value })}
-          className="bg-secondary/50 border-border/50 min-h-[120px] text-foreground placeholder:text-muted-foreground/60"
+          className="min-h-[120px] bg-card border-border/50 text-foreground placeholder:text-muted/60"
           required
         />
       </div>
 
       <Button 
         type="submit" 
-        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-11 text-sm font-medium"
+        className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-12 text-base font-medium"
         disabled={isLoading}
       >
         {isLoading ? "Analyzing..." : "Generate Revenue Opportunities"}
