@@ -4,6 +4,7 @@ import { AnalysisPanel } from "@/components/AnalysisPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { FormConfig, FormFields, ButtonConfig } from "@/types/database";
+import { Json } from "@/integrations/supabase/types";
 
 const RevenueFinder = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -30,13 +31,13 @@ const RevenueFinder = () => {
           throw new Error('No active form configuration found');
         }
 
-        // Type assertions for the JSON fields
-        const fields = data.fields as FormFields;
-        const buttonConfig = data.button_config as ButtonConfig;
+        // Type assertions with validation
+        const jsonFields = data.fields as Record<string, unknown>;
+        const jsonButtonConfig = data.button_config as Record<string, unknown>;
         
-        if (!fields || !buttonConfig) {
-          throw new Error('Invalid form configuration structure');
-        }
+        // Validate fields structure
+        const fields = validateFields(jsonFields);
+        const buttonConfig = validateButtonConfig(jsonButtonConfig);
         
         setFormConfig({
           id: data.id,
@@ -62,6 +63,54 @@ const RevenueFinder = () => {
 
     fetchFormConfig();
   }, [toast]);
+
+  // Validation helper functions
+  const validateFields = (json: Record<string, unknown>): FormFields => {
+    const fields: FormFields = {};
+    
+    for (const [key, value] of Object.entries(json)) {
+      if (typeof value === 'object' && value !== null) {
+        const field = value as Record<string, unknown>;
+        
+        if (
+          typeof field.type === 'string' &&
+          typeof field.label === 'string' &&
+          typeof field.required === 'boolean' &&
+          typeof field.order === 'number' &&
+          (field.placeholder === undefined || typeof field.placeholder === 'string') &&
+          (field.options === undefined || Array.isArray(field.options))
+        ) {
+          fields[key] = {
+            type: field.type as 'email' | 'textarea' | 'radio',
+            label: field.label,
+            placeholder: field.placeholder as string | undefined,
+            required: field.required,
+            order: field.order,
+            options: field.options as Array<{ value: string; label: string }> | undefined,
+          };
+        } else {
+          throw new Error(`Invalid field configuration for ${key}`);
+        }
+      }
+    }
+    
+    return fields;
+  };
+
+  const validateButtonConfig = (json: Record<string, unknown>): ButtonConfig => {
+    if (
+      typeof json.text === 'string' &&
+      typeof json.icon === 'string' &&
+      typeof json.loadingText === 'string'
+    ) {
+      return {
+        text: json.text,
+        icon: json.icon,
+        loadingText: json.loadingText,
+      };
+    }
+    throw new Error('Invalid button configuration');
+  };
 
   const handleSubmit = async (data: FormData) => {
     setIsLoading(true);
