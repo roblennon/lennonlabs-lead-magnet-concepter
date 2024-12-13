@@ -19,7 +19,7 @@ export function OfferField({ value, onChange, config }: OfferFieldProps) {
         placeholder={config.placeholder}
         value={value}
         onChange={(e) => onChange(e.target.value)}
-        className="min-h-[120px] bg-card border-border/50 text-foreground placeholder:text-muted/60"
+        className="min-h-[120px] resize-none bg-card border-border/50 text-foreground placeholder:text-muted/60"
         required={config.required}
       />
     </div>

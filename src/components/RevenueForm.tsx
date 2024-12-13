@@ -48,33 +48,30 @@ export function RevenueForm({ onSubmit, isLoading, config }: RevenueFormProps) {
         if (error) throw error;
         
         if (data.content) {
-          // Append the scraped content to any existing content
-          const updatedOffer = formData.offer + "\n\n" + data.content;
-          setFormData(prev => ({ ...prev, offer: updatedOffer }));
+          // Update the form data with the scraped content
+          setFormData(prev => ({
+            ...prev,
+            offer: data.content
+          }));
           
           toast({
             title: "Website content extracted",
             description: "Successfully analyzed your website content.",
           });
-          
-          // Submit the form with the updated offer
-          onSubmit({
-            ...formData,
-            offer: updatedOffer
-          });
-          return;
+          return; // Don't submit the form yet
         }
       } catch (error) {
         console.error('Error scraping URL:', error);
         toast({
           title: "Error",
-          description: "Failed to analyze website content. Proceeding with form submission.",
+          description: "Failed to analyze website content. Please enter your offer manually.",
           variant: "destructive",
         });
+        return; // Don't submit if there was an error
       }
     }
     
-    // If no URL or scraping failed, submit the form with current data
+    // Submit the form with current data
     onSubmit(formData);
   };
 
