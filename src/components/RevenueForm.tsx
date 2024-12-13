@@ -4,6 +4,8 @@ import { OfferField } from "./revenue-form/OfferField";
 import { RevenueSourceField } from "./revenue-form/RevenueSourceField";
 import { HelpRequestsField } from "./revenue-form/HelpRequestsField";
 import { SubmitButton } from "./revenue-form/SubmitButton";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 export type FormData = {
   email: string;
@@ -24,9 +26,53 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
     revenueSource: "services",
     helpRequests: "",
   });
+  const { toast } = useToast();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const isValidUrl = (text: string): boolean => {
+    const urlPattern = /^(https?:\/\/)?[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/;
+    return urlPattern.test(text.trim());
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Check if the offer field contains a URL
+    if (isValidUrl(formData.offer)) {
+      try {
+        const { data, error } = await supabase.functions.invoke('scrape-url', {
+          body: { url: formData.offer }
+        });
+
+        if (error) throw error;
+        
+        if (data.content) {
+          // Append the scraped content to any existing content
+          const updatedOffer = formData.offer + "\n\n" + data.content;
+          setFormData(prev => ({ ...prev, offer: updatedOffer }));
+          
+          toast({
+            title: "Website content extracted",
+            description: "Successfully analyzed your website content.",
+          });
+          
+          // Submit the form with the updated offer
+          onSubmit({
+            ...formData,
+            offer: updatedOffer
+          });
+          return;
+        }
+      } catch (error) {
+        console.error('Error scraping URL:', error);
+        toast({
+          title: "Error",
+          description: "Failed to analyze website content. Proceeding with form submission.",
+          variant: "destructive",
+        });
+      }
+    }
+    
+    // If no URL or scraping failed, submit the form with current data
     onSubmit(formData);
   };
 
