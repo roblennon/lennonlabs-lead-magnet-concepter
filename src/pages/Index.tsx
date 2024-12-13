@@ -12,6 +12,19 @@ const Index = () => {
   const handleSubmit = async (data: FormData) => {
     setIsLoading(true);
     try {
+      // If the offer field contains a URL, scrape it first
+      if (data.offer.startsWith('http') && data.offer.includes('.')) {
+        const { data: scrapedData, error: scrapeError } = await supabase.functions.invoke('scrape-url', {
+          body: { url: data.offer }
+        });
+
+        if (scrapeError) throw scrapeError;
+        if (scrapedData.content) {
+          data.offer = scrapedData.content;
+        }
+      }
+
+      // Send data for analysis
       const { data: response, error } = await supabase.functions.invoke('analyze-revenue', {
         body: data
       });
