@@ -24,7 +24,6 @@ export const typography = {
         color: '#333333',
         fontSize: '1.5rem',
         fontWeight: '400',
-        fontStyle: 'italic',
         lineHeight: '2rem',
         fontFamily: 'Inter, sans-serif',
         marginTop: '0.75rem',
