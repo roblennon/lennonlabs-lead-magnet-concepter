@@ -10,11 +10,11 @@ export function OfferField({ value, onChange }: OfferFieldProps) {
   return (
     <div className="space-y-2.5">
       <Label htmlFor="offer" className="text-base font-medium text-foreground">
-        Paste your website URL or main offer description
+        Paste your website URL or describe your business and offers
       </Label>
       <Textarea
         id="offer"
-        placeholder="e.g. aicontentreactor.com or describe your main offer"
+        placeholder="e.g. website.com or paste some marketing stuff"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="min-h-[120px] bg-card border-border/50 text-foreground placeholder:text-muted/60"

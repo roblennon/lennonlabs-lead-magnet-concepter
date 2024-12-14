@@ -112,7 +112,14 @@ const Index = () => {
               alt="Lennon Labs Logo" 
               className="h-8 w-8"
             />
-            <span className="text-sm text-muted">lennonlabs.com</span>
+            <a 
+              href="https://lennonlabs.com" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="text-sm text-muted hover:text-primary transition-colors"
+            >
+              lennonlabs.com
+            </a>
           </div>
         </div>
       </footer>
