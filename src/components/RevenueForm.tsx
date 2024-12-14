@@ -78,11 +78,6 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6 p-8">
-      <EmailField 
-        value={formData.email}
-        onChange={(value) => setFormData({ ...formData, email: value })}
-      />
-      
       <OfferField
         value={formData.offer}
         onChange={(value) => setFormData({ ...formData, offer: value })}
@@ -97,6 +92,16 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
         value={formData.helpRequests}
         onChange={(value) => setFormData({ ...formData, helpRequests: value })}
       />
+      
+      <div className="space-y-2">
+        <EmailField 
+          value={formData.email}
+          onChange={(value) => setFormData({ ...formData, email: value })}
+        />
+        <p className="text-sm text-muted-foreground">
+          Subscribe to the Lennon Labs newsletter to use this free resource. I deeply respect your privacy. Unsubscribe at any time.
+        </p>
+      </div>
       
       <SubmitButton isLoading={isLoading} />
     </form>
