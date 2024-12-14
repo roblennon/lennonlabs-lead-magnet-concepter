@@ -93,17 +93,19 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
         onChange={(value) => setFormData({ ...formData, helpRequests: value })}
       />
       
-      <div className="space-y-2">
+      <div>
         <EmailField 
           value={formData.email}
           onChange={(value) => setFormData({ ...formData, email: value })}
+          required={true}
         />
-        <p className="text-sm text-muted-foreground">
-          Subscribe to the Lennon Labs newsletter to use this free resource. I deeply respect your privacy. Unsubscribe at any time.
-        </p>
       </div>
       
       <SubmitButton isLoading={isLoading} />
+      
+      <p className="text-[0.65rem] text-muted-foreground">
+        *Subscribe to the Lennon Labs newsletter to use this free resource. I deeply respect your privacy. Unsubscribe at any time.
+      </p>
     </form>
   );
 }
