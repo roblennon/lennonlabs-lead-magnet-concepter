@@ -1,9 +1,9 @@
 export const typography = {
   DEFAULT: {
     css: {
-      color: 'hsl(var(--foreground))',
+      color: '#333333',
       h1: { 
-        color: 'hsl(var(--foreground))',
+        color: '#333333',
         fontSize: '2.25rem',
         fontWeight: '700',
         lineHeight: '2.5rem',
@@ -12,7 +12,7 @@ export const typography = {
         marginBottom: '1rem'
       },
       h2: { 
-        color: 'hsl(var(--foreground))',
+        color: '#333333',
         fontSize: '1.875rem',
         fontWeight: '600',
         lineHeight: '2.25rem',
@@ -21,7 +21,7 @@ export const typography = {
         marginBottom: '0.75rem'
       },
       h3: { 
-        color: 'hsl(var(--foreground))',
+        color: '#333333',
         fontSize: '1.5rem',
         fontWeight: '600',
         lineHeight: '2rem',
@@ -30,7 +30,7 @@ export const typography = {
         marginBottom: '0.75rem'
       },
       h4: { 
-        color: 'hsl(var(--foreground))',
+        color: '#333333',
         fontSize: '1.25rem',
         fontWeight: '600',
         lineHeight: '1.75rem',
@@ -39,7 +39,7 @@ export const typography = {
         marginBottom: '0.5rem'
       },
       strong: { 
-        color: 'hsl(var(--foreground))',
+        color: '#333333',
         fontWeight: '600'
       },
       ul: {
@@ -49,11 +49,12 @@ export const typography = {
         paddingLeft: '1.5rem',
         li: {
           marginTop: '0.25rem',
-          marginBottom: '0.25rem'
+          marginBottom: '0.25rem',
+          color: '#333333'
         }
       },
-      '--tw-prose-bullets': 'hsl(var(--foreground))',
-      '--tw-prose-counters': 'hsl(var(--foreground))',
+      '--tw-prose-bullets': '#333333',
+      '--tw-prose-counters': '#333333',
     },
   },
 };
