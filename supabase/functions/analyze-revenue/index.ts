@@ -60,7 +60,6 @@ async function callOpenRouter(prompt: string, model: string) {
     throw new Error('No valid content in OpenRouter response');
   }
 
-  console.log('Generated content:', result.choices[0].message.content);
   return result.choices[0].message.content;
 }
 
@@ -80,29 +79,22 @@ serve(async (req) => {
 
     console.log('Formatted prompt with variables replaced:', formattedPrompt);
 
-    let analysisContent;
+    let analysisContent = null;
     let usingFallback = false;
-    let lastError;
+    let currentModelIndex = 0;
+    let lastError = null;
 
-    // Try the primary model first
-    try {
-      analysisContent = await callOpenRouter(formattedPrompt, FALLBACK_MODELS[0]);
-    } catch (error) {
-      console.error('Primary model failed:', error);
-      lastError = error;
-    }
-
-    // Only if primary model fails, try fallbacks one at a time
-    if (!analysisContent) {
-      for (let i = 1; i < FALLBACK_MODELS.length; i++) {
-        try {
-          analysisContent = await callOpenRouter(formattedPrompt, FALLBACK_MODELS[i]);
-          usingFallback = true;
-          break; // Exit loop on successful generation
-        } catch (error) {
-          console.error(`Fallback model ${FALLBACK_MODELS[i]} failed:`, error);
-          lastError = error;
-        }
+    // Try models sequentially until one succeeds
+    while (currentModelIndex < FALLBACK_MODELS.length && !analysisContent) {
+      const currentModel = FALLBACK_MODELS[currentModelIndex];
+      try {
+        analysisContent = await callOpenRouter(formattedPrompt, currentModel);
+        usingFallback = currentModelIndex > 0; // Only true if we're using a fallback model
+        break; // Exit the loop if successful
+      } catch (error) {
+        console.error(`Model ${currentModel} failed:`, error);
+        lastError = error;
+        currentModelIndex++;
       }
     }
 
