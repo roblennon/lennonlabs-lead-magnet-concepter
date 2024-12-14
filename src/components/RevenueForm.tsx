@@ -70,6 +70,9 @@ export function RevenueForm({ onSubmit, isLoading, initialEmail }: RevenueFormPr
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    // Set loading state immediately through parent component
+    onSubmit(formData);
+    
     // Check if the offer field contains a URL
     if (isValidUrl(formData.offer)) {
       try {
@@ -112,9 +115,7 @@ export function RevenueForm({ onSubmit, isLoading, initialEmail }: RevenueFormPr
       }
     }
     
-    // If no URL or scraping failed, submit the form with current data
-    onSubmit(formData);
-    // Subscribe to ConvertKit after successful form submission
+    // If no URL or scraping failed, proceed with ConvertKit subscription
     await subscribeToConvertKit(formData.email, formData);
   };
 
