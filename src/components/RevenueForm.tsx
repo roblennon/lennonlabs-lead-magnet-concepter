@@ -101,7 +101,7 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
         />
       </div>
       
-      <div className="mt-16">
+      <div className="!mt-10">
         <SubmitButton isLoading={isLoading} />
       </div>
       
