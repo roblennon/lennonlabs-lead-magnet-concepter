@@ -82,24 +82,33 @@ serve(async (req) => {
 
     let analysisContent;
     let usingFallback = false;
+    let lastError;
 
-    // Try each model in sequence until one works
-    for (let i = 0; i < FALLBACK_MODELS.length; i++) {
-      try {
-        analysisContent = await callOpenRouter(formattedPrompt, FALLBACK_MODELS[i]);
-        if (i > 0) {
+    // Try the primary model first
+    try {
+      analysisContent = await callOpenRouter(formattedPrompt, FALLBACK_MODELS[0]);
+    } catch (error) {
+      console.error('Primary model failed:', error);
+      lastError = error;
+    }
+
+    // Only if primary model fails, try fallbacks one at a time
+    if (!analysisContent) {
+      for (let i = 1; i < FALLBACK_MODELS.length; i++) {
+        try {
+          analysisContent = await callOpenRouter(formattedPrompt, FALLBACK_MODELS[i]);
           usingFallback = true;
+          break; // Exit loop on successful generation
+        } catch (error) {
+          console.error(`Fallback model ${FALLBACK_MODELS[i]} failed:`, error);
+          lastError = error;
         }
-        break; // If successful, exit the loop
-      } catch (error) {
-        console.error(`Model ${FALLBACK_MODELS[i]} failed:`, error);
-        if (i === FALLBACK_MODELS.length - 1) {
-          // If this was the last model, throw the error
-          throw new Error('All available models failed to generate analysis');
-        }
-        // Otherwise, continue to the next model
-        continue;
       }
+    }
+
+    // If no model succeeded, throw the last error
+    if (!analysisContent) {
+      throw lastError || new Error('All models failed to generate analysis');
     }
 
     // Update the analysis in the database
