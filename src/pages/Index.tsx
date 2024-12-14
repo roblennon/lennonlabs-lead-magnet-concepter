@@ -58,7 +58,6 @@ const Index = () => {
 
       if (response.error) throw response.error;
 
-      // Check if using fallback model
       if (response.data?.usingFallback) {
         toast({
           title: "AI Model Fallback",
@@ -90,15 +89,6 @@ const Index = () => {
             Drop in your website URL or paste your primary offer, and answer two quick questions.
             Our AI analysis will identify your fastest path to increased revenue.
           </p>
-          
-          <div className="mt-6 p-4 bg-card/50 rounded-lg border border-border/30 inline-block text-left">
-            <p className="font-medium mb-2">Your Fastest Paths to Revenue:</p>
-            <ul className="text-muted space-y-1">
-              <li>Imposter Syndrome Mini-Course</li>
-              <li>Content Idea Generator Tool</li>
-              <li>"Hook of the Day" Email Series</li>
-            </ul>
-          </div>
         </div>
       </header>
 
