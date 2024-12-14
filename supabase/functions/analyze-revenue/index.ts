@@ -7,7 +7,12 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const FALLBACK_MODEL = "anthropic/claude-3.5-sonnet-20240620:beta";
+const FALLBACK_MODELS = [
+  "anthropic/claude-3.5-sonnet-20240620:beta",
+  "google/gemini-exp-1206:free",
+  "x-ai/grok-beta",
+  "meta-llama/llama-3.3-70b-instruct"
+];
 
 async function callOpenRouter(prompt: string, model: string) {
   console.log('Calling OpenRouter with model:', model);
@@ -68,7 +73,6 @@ serve(async (req) => {
     const { analysisId, prompt, data } = await req.json();
     console.log('Raw request data:', { analysisId, prompt, data });
 
-    // Format the prompt with the user's data
     const formattedPrompt = prompt
       .replace('{{offer}}', data.offer || '')
       .replace('{{revenueSource}}', data.revenueSource || '')
@@ -77,15 +81,24 @@ serve(async (req) => {
     console.log('Formatted prompt with variables replaced:', formattedPrompt);
 
     let analysisContent;
-    try {
-      analysisContent = await callOpenRouter(formattedPrompt, "google/gemini-2.0-flash-exp:free");
-    } catch (primaryError) {
-      console.log('Primary model failed, attempting fallback...', primaryError);
+    let usingFallback = false;
+
+    // Try each model in sequence until one works
+    for (let i = 0; i < FALLBACK_MODELS.length; i++) {
       try {
-        analysisContent = await callOpenRouter(formattedPrompt, FALLBACK_MODEL);
-      } catch (fallbackError) {
-        console.error('Both primary and fallback models failed:', { primaryError, fallbackError });
-        throw new Error('All available models failed to generate analysis');
+        analysisContent = await callOpenRouter(formattedPrompt, FALLBACK_MODELS[i]);
+        if (i > 0) {
+          usingFallback = true;
+        }
+        break; // If successful, exit the loop
+      } catch (error) {
+        console.error(`Model ${FALLBACK_MODELS[i]} failed:`, error);
+        if (i === FALLBACK_MODELS.length - 1) {
+          // If this was the last model, throw the error
+          throw new Error('All available models failed to generate analysis');
+        }
+        // Otherwise, continue to the next model
+        continue;
       }
     }
 
@@ -106,7 +119,7 @@ serve(async (req) => {
     }
 
     console.log('Successfully completed analysis process');
-    return new Response(JSON.stringify({ content: analysisContent }), {
+    return new Response(JSON.stringify({ content: analysisContent, usingFallback }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 

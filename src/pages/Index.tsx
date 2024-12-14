@@ -11,7 +11,6 @@ const Index = () => {
   const { toast } = useToast();
 
   useEffect(() => {
-    // Get email from URL query parameter
     const params = new URLSearchParams(window.location.search);
     const emailParam = params.get('email');
     if (emailParam) {
@@ -24,7 +23,6 @@ const Index = () => {
     setAnalysis(undefined);
     
     try {
-      // First, save the analysis request to the database
       const { data: savedAnalysis, error: dbError } = await supabase
         .from('revenue_analyses')
         .insert({
@@ -38,7 +36,6 @@ const Index = () => {
 
       if (dbError) throw dbError;
 
-      // Get the active AI config
       const { data: aiConfig, error: configError } = await supabase
         .from('ai_configs')
         .select()
@@ -49,7 +46,6 @@ const Index = () => {
 
       if (configError) throw configError;
 
-      // Send data for analysis
       const response = await supabase.functions.invoke('analyze-revenue', {
         body: { 
           analysisId: savedAnalysis.id,
@@ -62,7 +58,14 @@ const Index = () => {
 
       if (response.error) throw response.error;
 
-      // Handle the response data
+      // Check if using fallback model
+      if (response.data?.usingFallback) {
+        toast({
+          title: "AI Model Fallback",
+          description: "Initial AI is overloaded or failed. Trying a different model.",
+        });
+      }
+
       if (response.data?.content) {
         setAnalysis(response.data.content);
       }
