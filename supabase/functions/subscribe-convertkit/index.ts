@@ -11,9 +11,11 @@ const corsHeaders = {
 
 interface SubscribeRequest {
   email: string;
-  // Optional custom fields
   fields?: {
-    [key: string]: string;
+    offer_desc?: string;
+    ppl_ask_help_with?: string;
+    primary_revenue_from?: string;
+    [key: string]: string | undefined;
   };
 }
 
@@ -27,6 +29,7 @@ serve(async (req: Request) => {
     const { email, fields = {} } = await req.json() as SubscribeRequest;
 
     console.log("Subscribing email to ConvertKit:", email);
+    console.log("Custom fields:", fields);
 
     const response = await fetch(
       `https://api.convertkit.com/v3/forms/${FORM_ID}/subscribe`,

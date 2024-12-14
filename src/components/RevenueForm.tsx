@@ -33,13 +33,15 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
     return urlPattern.test(text.trim());
   };
 
-  const subscribeToConvertKit = async (email: string) => {
+  const subscribeToConvertKit = async (email: string, data: FormData) => {
     try {
       const { error } = await supabase.functions.invoke('subscribe-convertkit', {
         body: { 
           email,
           fields: {
-            revenue_source: formData.revenueSource,
+            offer_desc: data.offer,
+            ppl_ask_help_with: data.helpRequests,
+            primary_revenue_from: data.revenueSource,
           }
         }
       });
@@ -86,7 +88,10 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
           });
 
           // Subscribe to ConvertKit after successful form submission
-          await subscribeToConvertKit(formData.email);
+          await subscribeToConvertKit(formData.email, {
+            ...formData,
+            offer: updatedOffer
+          });
           return;
         }
       } catch (error) {
@@ -102,7 +107,7 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
     // If no URL or scraping failed, submit the form with current data
     onSubmit(formData);
     // Subscribe to ConvertKit after successful form submission
-    await subscribeToConvertKit(formData.email);
+    await subscribeToConvertKit(formData.email, formData);
   };
 
   return (
