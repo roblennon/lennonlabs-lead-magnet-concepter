@@ -33,6 +33,30 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
     return urlPattern.test(text.trim());
   };
 
+  const subscribeToConvertKit = async (email: string) => {
+    try {
+      const { error } = await supabase.functions.invoke('subscribe-convertkit', {
+        body: { 
+          email,
+          fields: {
+            revenue_source: formData.revenueSource,
+          }
+        }
+      });
+
+      if (error) throw error;
+      
+      console.log('Successfully subscribed to newsletter');
+    } catch (error) {
+      console.error('Error subscribing to newsletter:', error);
+      toast({
+        title: "Newsletter Subscription Error",
+        description: "Failed to subscribe to the newsletter, but your analysis was generated.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -60,6 +84,9 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
             ...formData,
             offer: updatedOffer
           });
+
+          // Subscribe to ConvertKit after successful form submission
+          await subscribeToConvertKit(formData.email);
           return;
         }
       } catch (error) {
@@ -74,6 +101,8 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
     
     // If no URL or scraping failed, submit the form with current data
     onSubmit(formData);
+    // Subscribe to ConvertKit after successful form submission
+    await subscribeToConvertKit(formData.email);
   };
 
   return (
