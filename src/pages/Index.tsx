@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { RevenueForm, FormData } from "@/components/RevenueForm";
 import { AnalysisPanel } from "@/components/AnalysisPanel";
 import { supabase } from "@/integrations/supabase/client";
@@ -7,7 +7,17 @@ import { useToast } from "@/hooks/use-toast";
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [analysis, setAnalysis] = useState<string>();
+  const [initialEmail, setInitialEmail] = useState<string>("");
   const { toast } = useToast();
+
+  useEffect(() => {
+    // Get email from URL query parameter
+    const params = new URLSearchParams(window.location.search);
+    const emailParam = params.get('email');
+    if (emailParam) {
+      setInitialEmail(emailParam);
+    }
+  }, []);
 
   const handleSubmit = async (data: FormData) => {
     setIsLoading(true);
@@ -83,7 +93,7 @@ const Index = () => {
       <main className="flex-1 container mx-auto px-8 py-8">
         <div className="grid md:grid-cols-2 gap-8">
           <div className="bg-card rounded-lg shadow-lg border border-border/30">
-            <RevenueForm onSubmit={handleSubmit} isLoading={isLoading} />
+            <RevenueForm onSubmit={handleSubmit} isLoading={isLoading} initialEmail={initialEmail} />
           </div>
           <div className="bg-card rounded-lg shadow-lg border border-border/30">
             <AnalysisPanel isLoading={isLoading} analysis={analysis} />

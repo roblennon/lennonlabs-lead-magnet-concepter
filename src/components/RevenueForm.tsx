@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { EmailField } from "./revenue-form/EmailField";
 import { OfferField } from "./revenue-form/OfferField";
 import { RevenueSourceField } from "./revenue-form/RevenueSourceField";
@@ -17,16 +17,24 @@ export type FormData = {
 interface RevenueFormProps {
   onSubmit: (data: FormData) => void;
   isLoading?: boolean;
+  initialEmail?: string;
 }
 
-export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
+export function RevenueForm({ onSubmit, isLoading, initialEmail }: RevenueFormProps) {
   const [formData, setFormData] = useState<FormData>({
-    email: "",
+    email: initialEmail || "",
     offer: "",
     revenueSource: "services",
     helpRequests: "",
   });
   const { toast } = useToast();
+
+  // Update email field if initialEmail changes
+  useEffect(() => {
+    if (initialEmail) {
+      setFormData(prev => ({ ...prev, email: initialEmail }));
+    }
+  }, [initialEmail]);
 
   const isValidUrl = (text: string): boolean => {
     const urlPattern = /^(https?:\/\/)?[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/;
@@ -114,23 +122,23 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
     <form onSubmit={handleSubmit} className="space-y-6 p-8">
       <OfferField
         value={formData.offer}
-        onChange={(value) => setFormData({ ...formData, offer: value })}
+        onChange={(value) => setFormData(prev => ({ ...prev, offer: value }))}
       />
       
       <RevenueSourceField
         value={formData.revenueSource}
-        onChange={(value) => setFormData({ ...formData, revenueSource: value })}
+        onChange={(value) => setFormData(prev => ({ ...prev, revenueSource: value }))}
       />
       
       <HelpRequestsField
         value={formData.helpRequests}
-        onChange={(value) => setFormData({ ...formData, helpRequests: value })}
+        onChange={(value) => setFormData(prev => ({ ...prev, helpRequests: value }))}
       />
       
       <div>
         <EmailField 
           value={formData.email}
-          onChange={(value) => setFormData({ ...formData, email: value })}
+          onChange={(value) => setFormData(prev => ({ ...prev, email: value }))}
           required={true}
         />
       </div>
