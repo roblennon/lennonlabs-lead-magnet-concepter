@@ -103,8 +103,8 @@ const Index = () => {
       </header>
 
       <main className="flex-1 container mx-auto px-8 py-8">
-        <div className="grid grid-cols-12 gap-8">
-          <div className="col-span-5 bg-card rounded-lg shadow-lg border border-border/30">
+        <div className="grid grid-cols-12 gap-8 items-start">
+          <div className="col-span-5 bg-card rounded-lg shadow-lg border border-border/30 h-fit">
             <RevenueForm onSubmit={handleSubmit} isLoading={isLoading} initialEmail={initialEmail} />
           </div>
           <div className="col-span-7 bg-card rounded-lg shadow-lg border border-border/30">
