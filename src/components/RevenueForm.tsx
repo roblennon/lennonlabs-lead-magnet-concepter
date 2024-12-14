@@ -101,9 +101,11 @@ export function RevenueForm({ onSubmit, isLoading }: RevenueFormProps) {
         />
       </div>
       
-      <SubmitButton isLoading={isLoading} />
+      <div className="mt-10">
+        <SubmitButton isLoading={isLoading} />
+      </div>
       
-      <p className="text-[0.65rem] text-muted-foreground">
+      <p className="text-[0.65rem] text-muted-foreground mx-8">
         *Subscribe to the Lennon Labs newsletter to use this free resource. I deeply respect your privacy. Unsubscribe at any time.
       </p>
     </form>
