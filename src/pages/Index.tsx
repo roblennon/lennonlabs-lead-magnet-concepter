@@ -84,21 +84,30 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <header className="border-b border-border/30">
-        <div className="container mx-auto px-8 py-8">
+        <div className="container mx-auto px-8 py-8 text-center">
           <h1 className="text-[2.5rem] font-bold text-primary mb-3">3-Minute Revenue Opportunity Finder</h1>
-          <p className="text-lg text-muted max-w-2xl leading-relaxed">
+          <p className="text-lg text-muted max-w-2xl mx-auto leading-relaxed">
             Drop in your website URL or paste your primary offer, and answer two quick questions.
             Our AI analysis will identify your fastest path to increased revenue.
           </p>
+          
+          <div className="mt-6 p-4 bg-card/50 rounded-lg border border-border/30 inline-block text-left">
+            <p className="font-medium mb-2">Your Fastest Paths to Revenue:</p>
+            <ul className="text-muted space-y-1">
+              <li>Imposter Syndrome Mini-Course</li>
+              <li>Content Idea Generator Tool</li>
+              <li>"Hook of the Day" Email Series</li>
+            </ul>
+          </div>
         </div>
       </header>
 
       <main className="flex-1 container mx-auto px-8 py-8">
-        <div className="grid md:grid-cols-2 gap-8">
-          <div className="bg-card rounded-lg shadow-lg border border-border/30">
+        <div className="grid grid-cols-12 gap-8">
+          <div className="col-span-5 bg-card rounded-lg shadow-lg border border-border/30">
             <RevenueForm onSubmit={handleSubmit} isLoading={isLoading} initialEmail={initialEmail} />
           </div>
-          <div className="bg-card rounded-lg shadow-lg border border-border/30">
+          <div className="col-span-7 bg-card rounded-lg shadow-lg border border-border/30">
             <AnalysisPanel isLoading={isLoading} analysis={analysis} />
           </div>
         </div>
