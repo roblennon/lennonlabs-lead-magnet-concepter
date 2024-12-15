@@ -1,93 +1,101 @@
 import { supabase } from "@/integrations/supabase/client";
-import { jsPDF } from "jspdf";
-
-// Configure PDF fonts and styling
-const configurePDF = (pdf: jsPDF) => {
-  pdf.setFont("helvetica", "normal");
-  pdf.setFontSize(11);
-  pdf.setLineHeightFactor(1.5);
-};
+import html2pdf from 'html2pdf.js';
 
 export const generatePDF = async (element: HTMLElement, filename: string): Promise<string> => {
   try {
-    // Initialize PDF
-    const pdf = new jsPDF({
-      unit: 'mm',
-      format: 'a4',
-      orientation: 'portrait'
+    // Create a temporary container for styling
+    const container = document.createElement('div');
+    container.style.padding = '40px';
+    container.style.fontFamily = 'Arial, sans-serif';
+    container.style.fontSize = '12pt';
+    container.style.lineHeight = '1.6';
+    container.style.color = '#000';
+
+    // Get the content and apply styling
+    const content = element.cloneNode(true) as HTMLElement;
+    
+    // Style headings
+    content.querySelectorAll('h1').forEach(h1 => {
+      h1.style.fontSize = '24pt';
+      h1.style.fontWeight = 'bold';
+      h1.style.marginBottom = '20px';
+      h1.style.color = '#000';
     });
 
-    configurePDF(pdf);
+    content.querySelectorAll('h2').forEach(h2 => {
+      h2.style.fontSize = '18pt';
+      h2.style.fontWeight = 'bold';
+      h2.style.marginTop = '25px';
+      h2.style.marginBottom = '15px';
+      h2.style.color = '#000';
+    });
 
-    // Get page dimensions and set margins
-    const pageWidth = pdf.internal.pageSize.getWidth();
-    const pageHeight = pdf.internal.pageSize.getHeight();
-    const margin = 20;
-    const maxWidth = pageWidth - (margin * 2);
+    content.querySelectorAll('h3').forEach(h3 => {
+      h3.style.fontSize = '16pt';
+      h3.style.fontWeight = 'bold';
+      h3.style.marginTop = '20px';
+      h3.style.marginBottom = '10px';
+      h3.style.color = '#000';
+    });
 
-    // Get raw text content
-    const rawContent = element.innerText || element.textContent;
-    if (!rawContent) throw new Error('No content found to generate PDF');
+    // Style paragraphs
+    content.querySelectorAll('p').forEach(p => {
+      p.style.marginBottom = '12px';
+      p.style.fontSize = '12pt';
+      p.style.color = '#000';
+    });
 
-    let currentY = margin;
+    // Style lists
+    content.querySelectorAll('ul').forEach(ul => {
+      ul.style.marginLeft = '20px';
+      ul.style.marginBottom = '15px';
+      ul.style.listStyleType = 'disc';
+    });
 
-    // Add title
-    pdf.setFont("helvetica", "bold");
-    pdf.setFontSize(16);
-    const title = "Your Fastest Paths to Revenue";
-    const titleLines = pdf.splitTextToSize(title, maxWidth);
-    pdf.text(titleLines, margin, currentY);
-    currentY += (titleLines.length * 10) + 10;
+    content.querySelectorAll('li').forEach(li => {
+      li.style.marginBottom = '8px';
+      li.style.fontSize = '12pt';
+      li.style.color = '#000';
+    });
 
-    // Process content line by line
-    const lines = rawContent.split('\n').filter(line => line.trim());
-    
-    for (const line of lines) {
-      // Skip the title since we already added it
-      if (line.trim() === title) continue;
+    // Add the styled content to the container
+    container.appendChild(content);
 
-      // Check if we need a new page
-      if (currentY > pageHeight - margin) {
-        pdf.addPage();
-        currentY = margin;
+    // Generate PDF with specific settings
+    const pdfOptions = {
+      margin: [15, 15, 15, 15],
+      filename: 'revenue-analysis.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2,
+        useCORS: true,
+        letterRendering: true,
+        logging: false
+      },
+      jsPDF: { 
+        unit: 'mm', 
+        format: 'a4', 
+        orientation: 'portrait',
+        compress: true
       }
-
-      // Style based on content type
-      if (line.includes('Highest-Leverage') || line.includes('Key Benefits') || line.includes('Next Steps') || line.includes('Implementation Guide') || line.includes('Getting It Done')) {
-        pdf.setFont("helvetica", "bold");
-        pdf.setFontSize(14);
-        const headingLines = pdf.splitTextToSize(line, maxWidth);
-        pdf.text(headingLines, margin, currentY);
-        currentY += (headingLines.length * 8) + 8;
-      } else if (line.startsWith('-') || line.startsWith('•')) {
-        pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(11);
-        const listLines = pdf.splitTextToSize(line, maxWidth);
-        pdf.text(listLines, margin + 5, currentY); // Indent list items
-        currentY += (listLines.length * 6) + 2;
-      } else {
-        pdf.setFont("helvetica", "normal");
-        pdf.setFontSize(11);
-        const textLines = pdf.splitTextToSize(line, maxWidth);
-        pdf.text(textLines, margin, currentY);
-        currentY += (textLines.length * 6) + 4;
-      }
-    }
+    };
 
     // Generate PDF blob
-    const pdfBlob = pdf.output('blob');
+    const pdf = await html2pdf().set(pdfOptions).from(container).output('blob');
+    
+    // Generate unique filename
     const timestamp = new Date().getTime();
     const storageFilename = `${filename}-${timestamp}.pdf`;
 
     // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
+    const { data, error: uploadError } = await supabase.storage
       .from('analysis-pdfs')
-      .upload(storageFilename, pdfBlob, {
+      .upload(storageFilename, pdf, {
         contentType: 'application/pdf',
         cacheControl: '15780000'
       });
 
-    if (error) throw error;
+    if (uploadError) throw uploadError;
 
     // Get public URL
     const { data: { publicUrl } } = supabase.storage
