@@ -1,12 +1,11 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const CONVERTKIT_API_KEY = Deno.env.get("CONVERTKIT_API_KEY");
-const FORM_ID = "7469655";
+const FORM_ID = "7469655"; // Your ConvertKit form ID
 
 const corsHeaders = {
-  "Access-Control-Allow-Origin": "*",
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type",
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
 interface SubscribeRequest {
@@ -15,6 +14,8 @@ interface SubscribeRequest {
     offer_desc?: string;
     ppl_ask_help_with?: string;
     primary_revenue_from?: string;
+    lead_magnet?: string;
+    lead_magnet_link?: string;
     [key: string]: string | undefined;
   };
 }
