@@ -1,12 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
 import { jsPDF } from "jspdf";
 
-type ContentType = "heading" | "paragraph" | "list";
-type ProcessedContent = {
-  type: ContentType;
-  text: string;
-};
-
 // Configure PDF fonts and styling
 const configurePDF = (pdf: jsPDF) => {
   pdf.setFont("helvetica", "normal");
@@ -14,66 +8,9 @@ const configurePDF = (pdf: jsPDF) => {
   pdf.setLineHeightFactor(1.5);
 };
 
-const stripXMLTags = (text: string): string => {
-  return text.replace(/<[^>]*>/g, '').trim();
-};
-
-const processContent = (content: string): ProcessedContent[] => {
-  // Split content by newlines and process each line
-  return content.split('\n')
-    .map(line => {
-      line = stripXMLTags(line.trim());
-      if (!line) return null;
-
-      // Detect content type based on markdown-like patterns
-      if (line.startsWith('# ') || line.includes('Highest-Leverage') || line.includes('Key Benefits') || line.includes('Next Steps')) {
-        return { type: "heading" as const, text: line.replace('# ', '') };
-      } else if (line.startsWith('- ')) {
-        return { type: "list" as const, text: line.substring(2) };
-      } else {
-        return { type: "paragraph" as const, text: line };
-      }
-    })
-    .filter((item): item is ProcessedContent => item !== null);
-};
-
-const addTextWithWrapping = (
-  pdf: jsPDF, 
-  content: ProcessedContent,
-  x: number, 
-  y: number, 
-  maxWidth: number
-): number => {
-  // Configure styling based on content type
-  switch (content.type) {
-    case 'heading':
-      pdf.setFont("helvetica", "bold");
-      pdf.setFontSize(14);
-      break;
-    case 'list':
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(11);
-      content.text = '• ' + content.text; // Add bullet point
-      break;
-    case 'paragraph':
-      pdf.setFont("helvetica", "normal");
-      pdf.setFontSize(11);
-      break;
-  }
-
-  // Split text to fit width and add to PDF
-  const lines = pdf.splitTextToSize(content.text, maxWidth);
-  pdf.text(lines, x, y);
-
-  // Calculate next Y position based on content type and number of lines
-  const lineHeight = pdf.getLineHeight() / pdf.internal.scaleFactor;
-  const spacing = content.type === 'heading' ? 2 : 1;
-  return y + (lines.length * lineHeight * spacing);
-};
-
 export const generatePDF = async (element: HTMLElement, filename: string): Promise<string> => {
   try {
-    // Initialize PDF with A4 format
+    // Initialize PDF
     const pdf = new jsPDF({
       unit: 'mm',
       format: 'a4',
@@ -88,44 +25,53 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
     const margin = 20;
     const maxWidth = pageWidth - (margin * 2);
 
-    // Get content and process it
+    // Get raw text content
     const rawContent = element.innerText || element.textContent;
     if (!rawContent) throw new Error('No content found to generate PDF');
-    
-    const processedContent = processContent(rawContent);
 
     let currentY = margin;
 
     // Add title
     pdf.setFont("helvetica", "bold");
     pdf.setFontSize(16);
-    currentY = addTextWithWrapping(
-      pdf,
-      { type: "heading", text: "Your Fastest Paths to Revenue" },
-      margin,
-      currentY,
-      maxWidth
-    );
-    currentY += 10; // Extra spacing after title
+    const title = "Your Fastest Paths to Revenue";
+    const titleLines = pdf.splitTextToSize(title, maxWidth);
+    pdf.text(titleLines, margin, currentY);
+    currentY += (titleLines.length * 10) + 10;
 
-    // Process each content block
-    for (const content of processedContent) {
+    // Process content line by line
+    const lines = rawContent.split('\n').filter(line => line.trim());
+    
+    for (const line of lines) {
+      // Skip the title since we already added it
+      if (line.trim() === title) continue;
+
       // Check if we need a new page
       if (currentY > pageHeight - margin) {
         pdf.addPage();
         currentY = margin;
       }
 
-      currentY = addTextWithWrapping(
-        pdf,
-        content,
-        margin,
-        currentY,
-        maxWidth
-      );
-
-      // Add appropriate spacing after each content block
-      currentY += content.type === 'heading' ? 8 : 4;
+      // Style based on content type
+      if (line.includes('Highest-Leverage') || line.includes('Key Benefits') || line.includes('Next Steps') || line.includes('Implementation Guide') || line.includes('Getting It Done')) {
+        pdf.setFont("helvetica", "bold");
+        pdf.setFontSize(14);
+        const headingLines = pdf.splitTextToSize(line, maxWidth);
+        pdf.text(headingLines, margin, currentY);
+        currentY += (headingLines.length * 8) + 8;
+      } else if (line.startsWith('-') || line.startsWith('•')) {
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(11);
+        const listLines = pdf.splitTextToSize(line, maxWidth);
+        pdf.text(listLines, margin + 5, currentY); // Indent list items
+        currentY += (listLines.length * 6) + 2;
+      } else {
+        pdf.setFont("helvetica", "normal");
+        pdf.setFontSize(11);
+        const textLines = pdf.splitTextToSize(line, maxWidth);
+        pdf.text(textLines, margin, currentY);
+        currentY += (textLines.length * 6) + 4;
+      }
     }
 
     // Generate PDF blob
