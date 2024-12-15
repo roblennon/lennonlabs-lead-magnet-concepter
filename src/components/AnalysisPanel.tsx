@@ -1,10 +1,9 @@
 import { Card } from "./ui/card";
 import { Button } from "./ui/button";
 import { Copy, Download, Loader2 } from "lucide-react";
-import ReactMarkdown from 'react-markdown';
 import { useToast } from "@/hooks/use-toast";
-import html2pdf from 'html2pdf.js';
-import { supabase } from "@/integrations/supabase/client";
+import { AnalysisContent } from "./AnalysisContent";
+import { generatePDF, processMarkdownForPDF } from "@/utils/pdfUtils";
 
 interface AnalysisPanelProps {
   isLoading?: boolean;
@@ -26,50 +25,26 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
 
   const exportToPDF = async () => {
     if (analysis) {
-      const element = document.getElementById('analysis-content');
-      
-      // Create optimized PDF
-      const pdf = await html2pdf().set({
-        margin: 1,
-        filename: 'revenue-analysis.pdf',
-        image: { type: 'jpeg', quality: 0.95 }, // Slightly reduced image quality
-        html2canvas: { 
-          scale: 1.5, // Reduced from 2 to 1.5 for better file size
-          useCORS: true,
-          letterRendering: true
-        },
-        jsPDF: { 
-          unit: 'in', 
-          format: 'letter', 
-          orientation: 'portrait',
-          compress: true, // Enable compression
-          precision: 3 // Reduce precision for smaller file size
-        },
-        pagebreak: { 
-          mode: ['avoid-all', 'css', 'legacy'],
-          before: '.section-break'
-        }
-      }).from(element).output('blob');
-
-      // Generate unique filename
-      const timestamp = new Date().getTime();
-      const filename = `analysis-${timestamp}.pdf`;
-
       try {
-        // Upload to Supabase Storage
-        const { data, error } = await supabase.storage
-          .from('analysis-pdfs')
-          .upload(filename, pdf, {
-            contentType: 'application/pdf',
-            cacheControl: '15780000' // 6 months cache
-          });
+        const element = document.getElementById('analysis-content');
+        if (!element) return;
 
-        if (error) throw error;
+        // Create a temporary div for PDF generation
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = element.innerHTML;
+        tempDiv.style.padding = '1in';
+        tempDiv.style.maxWidth = '8.5in';
+        document.body.appendChild(tempDiv);
 
-        // Get public URL
-        const { data: { publicUrl } } = supabase.storage
-          .from('analysis-pdfs')
-          .getPublicUrl(filename);
+        // Process the content for PDF
+        const processedContent = processMarkdownForPDF(analysis);
+        tempDiv.innerHTML = `<div class="prose max-w-none font-inter text-gray-700">${processedContent}</div>`;
+
+        // Generate and upload PDF
+        const publicUrl = await generatePDF(tempDiv, 'revenue-analysis');
+
+        // Clean up
+        document.body.removeChild(tempDiv);
 
         // Download the file
         const link = document.createElement('a');
@@ -103,11 +78,6 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
       </div>
     );
   }
-
-  // Process the markdown to add section breaks before each heading
-  const processedAnalysis = analysis?.replace(/^(#+ )/gm, (match) => {
-    return `\n::: section-break\n${match}`;
-  });
 
   return (
     <Card className="bg-white p-8 border-border/50 h-full">
@@ -145,9 +115,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
               Export PDF
             </Button>
           </div>
-          <div id="analysis-content" className="prose max-w-none font-inter text-gray-700 [&_.section-break]:break-before-page">
-            <ReactMarkdown>{processedAnalysis}</ReactMarkdown>
-          </div>
+          <AnalysisContent content={analysis} />
         </div>
       )}
     </Card>
