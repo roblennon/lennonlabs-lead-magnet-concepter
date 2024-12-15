@@ -26,25 +26,19 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
   const exportToPDF = async () => {
     if (analysis) {
       try {
-        const element = document.getElementById('analysis-content');
-        if (!element) return;
+        // Process the markdown content
+        const htmlContent = processMarkdownForPDF(analysis);
 
-        // Create a temporary div for PDF generation
-        const tempDiv = document.createElement('div');
-        tempDiv.innerHTML = element.innerHTML;
-        tempDiv.style.padding = '1in';
-        tempDiv.style.maxWidth = '8.5in';
-        document.body.appendChild(tempDiv);
+        // Create a temporary container for the processed HTML
+        const tempContainer = document.createElement('div');
+        tempContainer.innerHTML = htmlContent;
+        document.body.appendChild(tempContainer);
 
-        // Process the content for PDF
-        const processedContent = processMarkdownForPDF(analysis);
-        tempDiv.innerHTML = `<div class="prose max-w-none font-inter text-gray-700">${processedContent}</div>`;
+        // Generate and get the PDF URL
+        const publicUrl = await generatePDF(tempContainer, 'revenue-analysis');
 
-        // Generate and upload PDF
-        const publicUrl = await generatePDF(tempDiv, 'revenue-analysis');
-
-        // Clean up
-        document.body.removeChild(tempDiv);
+        // Clean up the temporary container
+        document.body.removeChild(tempContainer);
 
         // Download the file
         const link = document.createElement('a');

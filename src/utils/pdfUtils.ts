@@ -1,6 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import ReactMarkdown from 'react-markdown';
+import { renderToString } from 'react-dom/server';
 
 const PDF_STYLES = `
 body {
@@ -56,7 +58,24 @@ strong {
 `;
 
 export const processMarkdownForPDF = (markdown: string): string => {
-  return markdown.trim();
+  // Convert markdown to HTML using ReactMarkdown
+  const htmlContent = renderToString(
+    <ReactMarkdown>{markdown}</ReactMarkdown>
+  );
+
+  // Wrap the HTML content with proper styling
+  return `
+    <html>
+      <head>
+        <style>${PDF_STYLES}</style>
+      </head>
+      <body>
+        <div class="prose prose-slate max-w-none font-inter">
+          ${htmlContent}
+        </div>
+      </body>
+    </html>
+  `;
 };
 
 export const generatePDF = async (element: HTMLElement, filename: string): Promise<string> => {
