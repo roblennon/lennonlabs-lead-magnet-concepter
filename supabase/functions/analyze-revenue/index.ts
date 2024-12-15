@@ -30,7 +30,9 @@ async function callOpenRouter(prompt: string, model: string) {
           role: "user",
           content: prompt
         }
-      ]
+      ],
+      max_tokens: 4000, // Increased max tokens for longer responses
+      temperature: 0.7 // Slightly reduced temperature for more focused responses
     }),
   });
 
@@ -95,6 +97,7 @@ serve(async (req) => {
     try {
       analysisContent = await callOpenRouter(formattedPrompt, MODEL);
       console.log('Successfully generated analysis content');
+      console.log('Analysis content length:', analysisContent.length);
     } catch (error) {
       console.error(`Model ${MODEL} failed:`, error);
       throw error;

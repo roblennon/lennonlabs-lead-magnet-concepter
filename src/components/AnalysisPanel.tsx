@@ -72,7 +72,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
   }
 
   return (
-    <Card className="bg-white p-8 border-border/50 h-full">
+    <Card className="bg-white p-8 border-border/50 h-full overflow-auto">
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-full gap-4">
           <div className="relative">
