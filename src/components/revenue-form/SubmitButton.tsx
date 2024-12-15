@@ -1,5 +1,4 @@
 import { Button } from "../ui/button";
-import { Zap } from "lucide-react";
 
 interface SubmitButtonProps {
   isLoading?: boolean;
@@ -13,7 +12,6 @@ export function SubmitButton({ isLoading }: SubmitButtonProps) {
       disabled={isLoading}
     >
       {isLoading ? "Analyzing..." : "Generate Revenue Opportunities"}
-      {!isLoading && <Zap className="ml-2" />}
     </Button>
   );
 }

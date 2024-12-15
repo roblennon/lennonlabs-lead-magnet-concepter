@@ -180,7 +180,7 @@ const Index = () => {
             <img 
               src="/lovable-uploads/03da23fe-9a53-4fbe-b9d9-1ee4f1589282.png" 
               alt="Lennon Labs Logo" 
-              className="h-5 w-5"
+              className="h-10 w-10"
             />
             <span>Made with</span>
             <span className="text-red-500">❤️</span>
