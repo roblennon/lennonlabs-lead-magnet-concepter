@@ -3,6 +3,7 @@ import { RevenueForm, FormData } from "@/components/RevenueForm";
 import { AnalysisPanel } from "@/components/AnalysisPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import html2pdf from 'html2pdf.js';
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
