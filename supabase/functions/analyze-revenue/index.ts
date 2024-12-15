@@ -6,7 +6,6 @@ const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
-  'Access-Control-Max-Age': '86400',
 };
 
 // Use a single model instead of fallbacks
@@ -71,8 +70,18 @@ serve(async (req) => {
   }
 
   try {
+    // Log the incoming request
+    console.log('Received request:', {
+      method: req.method,
+      headers: Object.fromEntries(req.headers.entries())
+    });
+
     const { analysisId, prompt, data } = await req.json();
     console.log('Raw request data:', { analysisId, prompt, data });
+
+    if (!analysisId || !prompt || !data) {
+      throw new Error('Missing required fields');
+    }
 
     const formattedPrompt = prompt
       .replace('{{offer}}', data.offer || '')
@@ -85,6 +94,7 @@ serve(async (req) => {
     
     try {
       analysisContent = await callOpenRouter(formattedPrompt, MODEL);
+      console.log('Successfully generated analysis content');
     } catch (error) {
       console.error(`Model ${MODEL} failed:`, error);
       throw error;
@@ -100,7 +110,7 @@ serve(async (req) => {
       .from('revenue_analyses')
       .update({ 
         analysis: analysisContent,
-        successful_model: MODEL // Store the successful model
+        successful_model: MODEL
       })
       .eq('id', analysisId);
 
@@ -110,15 +120,25 @@ serve(async (req) => {
     }
 
     console.log('Successfully completed analysis process');
-    return new Response(JSON.stringify({ content: analysisContent }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ content: analysisContent }), 
+      {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+        status: 200
+      }
+    );
 
   } catch (error) {
     console.error('Error in analyze-revenue function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ 
+        error: error.message,
+        details: error.stack 
+      }), 
+      {
+        status: 500,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      }
+    );
   }
 });
