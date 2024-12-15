@@ -3,12 +3,28 @@ import { jsPDF } from "jspdf";
 
 // Configure PDF fonts and styling
 const configurePDF = (pdf: jsPDF) => {
-  pdf.setFont("helvetica");
+  pdf.setFont("helvetica", "normal");
   pdf.setFontSize(11);
   pdf.setLineHeightFactor(1.5);
 };
 
-const addTextWithWrapping = (pdf: jsPDF, text: string, x: number, y: number, maxWidth: number): number => {
+const addTextWithWrapping = (
+  pdf: jsPDF, 
+  text: string, 
+  x: number, 
+  y: number, 
+  maxWidth: number,
+  options: { fontSize?: number; isBold?: boolean } = {}
+): number => {
+  if (options.fontSize) {
+    pdf.setFontSize(options.fontSize);
+  }
+  if (options.isBold) {
+    pdf.setFont("helvetica", "bold");
+  } else {
+    pdf.setFont("helvetica", "normal");
+  }
+
   const lines = pdf.splitTextToSize(text, maxWidth);
   pdf.text(lines, x, y);
   return y + (lines.length * pdf.getLineHeight());
@@ -31,30 +47,62 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
     const margin = 20;
     const maxWidth = pageWidth - (margin * 2);
 
-    // Get text content
-    const content = element.innerText;
-    
-    // Split content into sections
-    const sections = content.split('\n\n').filter(Boolean);
+    // Get content and split into sections
+    const content = element.innerHTML;
+    const sections = content.split(/<\/?p>/).filter(Boolean)
+      .map(section => section.trim())
+      .filter(section => section.length > 0);
 
     let currentY = margin;
-    let currentPage = 1;
+
+    // Add title
+    currentY = addTextWithWrapping(
+      pdf,
+      "Your Fastest Paths to Revenue",
+      margin,
+      currentY,
+      maxWidth,
+      { fontSize: 16, isBold: true }
+    );
+    currentY += 10; // Extra spacing after title
 
     // Process each section
-    sections.forEach((section: string) => {
+    for (let section of sections) {
       // Check if we need a new page
       if (currentY > pageHeight - margin) {
         pdf.addPage();
-        currentPage++;
         currentY = margin;
       }
 
-      // Add section text with proper wrapping
-      if (section.trim()) {
-        currentY = addTextWithWrapping(pdf, section.trim(), margin, currentY, maxWidth);
-        currentY += 5; // Add some spacing between sections
+      // Check if section is a heading (contains "Highest-Leverage" or similar key phrases)
+      const isHeading = section.includes("Highest-Leverage") || 
+                       section.includes("Here are your") ||
+                       section.includes("Key Benefits") ||
+                       section.includes("Next Steps");
+
+      if (isHeading) {
+        currentY += 5; // Extra space before headings
+        currentY = addTextWithWrapping(
+          pdf,
+          section,
+          margin,
+          currentY,
+          maxWidth,
+          { fontSize: 13, isBold: true }
+        );
+        currentY += 5; // Extra space after headings
+      } else {
+        // Regular paragraph
+        currentY = addTextWithWrapping(
+          pdf,
+          section,
+          margin,
+          currentY,
+          maxWidth
+        );
+        currentY += 5; // Standard paragraph spacing
       }
-    });
+    }
 
     // Generate PDF blob
     const pdfBlob = pdf.output('blob');
