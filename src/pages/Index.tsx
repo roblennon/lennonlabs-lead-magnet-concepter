@@ -4,6 +4,7 @@ import { AnalysisPanel } from "@/components/AnalysisPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import html2pdf from 'html2pdf.js';
+import { Rocket } from "lucide-react";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -176,7 +177,8 @@ const Index = () => {
 
       <footer className="border-t border-border/30 py-6">
         <div className="container mx-auto px-8">
-          <div className="flex items-center justify-center space-x-2">
+          <div className="flex items-center justify-start space-x-2 text-muted-foreground">
+            <Rocket className="h-5 w-5 text-primary" />
             <span>Made with</span>
             <span className="text-red-500">❤️</span>
             <span>by Rob Lennon |</span>
