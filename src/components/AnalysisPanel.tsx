@@ -24,40 +24,40 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
   };
 
   const exportToPDF = async () => {
-    if (analysis) {
-      try {
-        const element = document.getElementById('analysis-content');
-        if (!element) return;
-
-        // Show loading toast
-        toast({
-          title: "Generating PDF...",
-          description: "Please wait while we prepare your document",
-        });
-
-        // Generate and get the PDF URL
-        const publicUrl = await generatePDF(element, 'revenue-analysis');
-
-        // Download the file
-        const link = document.createElement('a');
-        link.href = publicUrl;
-        link.download = 'revenue-analysis.pdf';
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-
-        toast({
-          title: "Downloaded!",
-          description: "Analysis saved as PDF",
-        });
-      } catch (error) {
-        console.error('Error saving PDF:', error);
-        toast({
-          title: "Error",
-          description: "Failed to save PDF. Please try again.",
-          variant: "destructive",
-        });
+    if (!analysis) return;
+    
+    try {
+      const element = document.getElementById('analysis-content');
+      if (!element) {
+        throw new Error('Content element not found');
       }
+
+      toast({
+        title: "Generating PDF...",
+        description: "Please wait while we prepare your document",
+      });
+
+      const publicUrl = await generatePDF(element, 'revenue-analysis');
+
+      // Create temporary link and trigger download
+      const link = document.createElement('a');
+      link.href = publicUrl;
+      link.download = 'revenue-analysis.pdf';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+
+      toast({
+        title: "Success!",
+        description: "Your PDF has been downloaded",
+      });
+    } catch (error) {
+      console.error('Error saving PDF:', error);
+      toast({
+        title: "Error",
+        description: "Failed to generate PDF. Please try again.",
+        variant: "destructive",
+      });
     }
   };
 
