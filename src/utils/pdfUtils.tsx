@@ -1,163 +1,103 @@
 import { supabase } from "@/integrations/supabase/client";
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 import ReactMarkdown from 'react-markdown';
-import { renderToStaticMarkup } from 'react-dom/server';
-import React from 'react';
+import { renderToString } from 'react-dom/server';
 
-const PDF_STYLES = `
-body {
-  font-family: 'Inter', sans-serif;
-  line-height: 1.6;
-  color: #374151;
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 1rem 2rem;
-}
+// Configure PDF fonts and styling
+const configurePDF = (pdf: jsPDF) => {
+  pdf.setFont("helvetica");
+  pdf.setFontSize(11);
+  pdf.setLineHeightFactor(1.5);
+};
 
-h1 {
-  font-size: 2.25rem;
-  font-weight: 700;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  color: #111827;
-}
+const addTextWithWrapping = (pdf: jsPDF, text: string, x: number, y: number, maxWidth: number): number => {
+  const lines = pdf.splitTextToSize(text, maxWidth);
+  pdf.text(lines, x, y);
+  return y + (lines.length * pdf.getLineHeight());
+};
 
-h2 {
-  font-size: 1.875rem;
-  font-weight: 600;
-  margin-top: 3rem;
-  margin-bottom: 1rem;
-  color: #1F2937;
-  page-break-before: always;
-}
-
-h3 {
-  font-size: 1.5rem;
-  font-weight: 600;
-  margin-top: 2rem;
-  margin-bottom: 0.75rem;
-  color: #374151;
-}
-
-p {
-  margin-bottom: 1.25rem;
-  page-break-inside: avoid;
-}
-
-ul, ol {
-  margin-bottom: 1.25rem;
-  padding-left: 1.5rem;
-  page-break-inside: avoid;
-}
-
-li {
-  margin-bottom: 0.5rem;
-}
-
-strong {
-  font-weight: 600;
-  color: #111827;
-}
-
-@page {
-  margin: 1cm;
-  size: A4;
-}
-
-@media print {
-  body {
-    width: 21cm;
-    height: 29.7cm;
-    margin: 0;
-    padding: 1.5cm;
+const processMarkdownNode = (node: any): string => {
+  if (typeof node === 'string') return node;
+  
+  if (Array.isArray(node)) {
+    return node.map(n => processMarkdownNode(n)).join('\n');
   }
-}
-`;
 
-export const processMarkdownForPDF = (markdown: string): string => {
-  const htmlContent = renderToStaticMarkup(
-    React.createElement(ReactMarkdown, null, markdown)
-  );
+  if (node.type === 'heading') {
+    return `${'\n'.repeat(2)}${node.children.map(processMarkdownNode).join('')}${'\n'}`;
+  }
 
-  return `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <meta charset="UTF-8">
-        <style>${PDF_STYLES}</style>
-      </head>
-      <body>
-        <div class="prose prose-slate max-w-none font-inter">
-          ${htmlContent}
-        </div>
-      </body>
-    </html>
-  `;
+  if (node.type === 'paragraph') {
+    return `${node.children.map(processMarkdownNode).join('')}\n\n`;
+  }
+
+  if (node.type === 'list') {
+    return node.children.map((item: any, i: number) => 
+      `${i + 1}. ${processMarkdownNode(item)}\n`
+    ).join('');
+  }
+
+  if (node.type === 'listItem') {
+    return node.children.map(processMarkdownNode).join('');
+  }
+
+  if (node.type === 'strong') {
+    return node.children.map(processMarkdownNode).join('');
+  }
+
+  return node.children ? node.children.map(processMarkdownNode).join('') : '';
 };
 
 export const generatePDF = async (element: HTMLElement, filename: string): Promise<string> => {
   try {
-    // Create a hidden container for PDF generation
-    const container = document.createElement('div');
-    container.style.position = 'absolute';
-    container.style.left = '-9999px';
-    container.style.top = '-9999px';
-    container.innerHTML = processMarkdownForPDF(element.innerText);
-    document.body.appendChild(container);
-
+    // Initialize PDF with A4 format
     const pdf = new jsPDF({
+      unit: 'mm',
       format: 'a4',
-      unit: 'pt',
       orientation: 'portrait'
     });
 
-    // Calculate page dimensions
+    configurePDF(pdf);
+
+    // Get page dimensions
     const pageWidth = pdf.internal.pageSize.getWidth();
     const pageHeight = pdf.internal.pageSize.getHeight();
-    const margin = 40;
+    const margin = 20;
+    const maxWidth = pageWidth - (margin * 2);
 
-    // Generate PDF with multiple pages
-    const canvas = await html2canvas(container, {
-      scale: 2,
-      useCORS: true,
-      logging: false,
-      width: pageWidth - (margin * 2),
-      height: container.scrollHeight,
-      backgroundColor: '#ffffff'
-    });
+    // Parse markdown content
+    const markdownContent = element.innerText;
+    const parsedContent = require('react-markdown').unified().parse(markdownContent);
+    const processedText = processMarkdownNode(parsedContent);
 
-    const contentWidth = canvas.width;
-    const contentHeight = canvas.height;
-    const pageContentHeight = pageHeight - (margin * 2);
-    const totalPages = Math.ceil(contentHeight / pageContentHeight);
+    // Split content into sections
+    const sections = processedText.split('\n\n').filter(Boolean);
 
-    // Add content page by page
-    for (let i = 0; i < totalPages; i++) {
-      if (i > 0) {
+    let currentY = margin;
+    let currentPage = 1;
+
+    // Process each section
+    sections.forEach((section: string) => {
+      // Check if we need a new page
+      if (currentY > pageHeight - margin) {
         pdf.addPage();
+        currentPage++;
+        currentY = margin;
       }
 
-      const srcY = i * pageContentHeight;
-      const sliceHeight = Math.min(pageContentHeight, contentHeight - srcY);
+      // Add section text with proper wrapping
+      if (section.trim()) {
+        currentY = addTextWithWrapping(pdf, section.trim(), margin, currentY, maxWidth);
+        currentY += 5; // Add some spacing between sections
+      }
+    });
 
-      pdf.addImage(
-        canvas,
-        'JPEG',
-        margin,
-        margin + (i === 0 ? 0 : -srcY),
-        contentWidth,
-        contentHeight
-      );
-    }
-
-    // Clean up the temporary container
-    document.body.removeChild(container);
-
+    // Generate PDF blob
     const pdfBlob = pdf.output('blob');
     const timestamp = new Date().getTime();
     const storageFilename = `${filename}-${timestamp}.pdf`;
 
+    // Upload to Supabase Storage
     const { data, error } = await supabase.storage
       .from('analysis-pdfs')
       .upload(storageFilename, pdfBlob, {
@@ -167,6 +107,7 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
 
     if (error) throw error;
 
+    // Get public URL
     const { data: { publicUrl } } = supabase.storage
       .from('analysis-pdfs')
       .getPublicUrl(storageFilename);

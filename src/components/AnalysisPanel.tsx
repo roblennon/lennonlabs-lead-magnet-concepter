@@ -3,7 +3,7 @@ import { Button } from "./ui/button";
 import { Copy, Download, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AnalysisContent } from "./AnalysisContent";
-import { generatePDF, processMarkdownForPDF } from "@/utils/pdfUtils";
+import { generatePDF } from "@/utils/pdfUtils";
 
 interface AnalysisPanelProps {
   isLoading?: boolean;
@@ -26,19 +26,17 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
   const exportToPDF = async () => {
     if (analysis) {
       try {
-        // Process the markdown content
-        const htmlContent = processMarkdownForPDF(analysis);
+        const element = document.getElementById('analysis-content');
+        if (!element) return;
 
-        // Create a temporary container for the processed HTML
-        const tempContainer = document.createElement('div');
-        tempContainer.innerHTML = htmlContent;
-        document.body.appendChild(tempContainer);
+        // Show loading toast
+        toast({
+          title: "Generating PDF...",
+          description: "Please wait while we prepare your document",
+        });
 
         // Generate and get the PDF URL
-        const publicUrl = await generatePDF(tempContainer, 'revenue-analysis');
-
-        // Clean up the temporary container
-        document.body.removeChild(tempContainer);
+        const publicUrl = await generatePDF(element, 'revenue-analysis');
 
         // Download the file
         const link = document.createElement('a');
