@@ -4,8 +4,8 @@ import { OfferField } from "./revenue-form/OfferField";
 import { RevenueSourceField } from "./revenue-form/RevenueSourceField";
 import { HelpRequestsField } from "./revenue-form/HelpRequestsField";
 import { SubmitButton } from "./revenue-form/SubmitButton";
-import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export type FormData = {
   email: string;
@@ -41,32 +41,6 @@ export function RevenueForm({ onSubmit, isLoading, initialEmail }: RevenueFormPr
     return urlPattern.test(text.trim());
   };
 
-  const subscribeToConvertKit = async (email: string, data: FormData) => {
-    try {
-      const { error } = await supabase.functions.invoke('subscribe-convertkit', {
-        body: { 
-          email,
-          fields: {
-            offer_desc: data.offer,
-            ppl_ask_help_with: data.helpRequests,
-            primary_revenue_from: data.revenueSource,
-          }
-        }
-      });
-
-      if (error) throw error;
-      
-      console.log('Successfully subscribed to newsletter');
-    } catch (error) {
-      console.error('Error subscribing to newsletter:', error);
-      toast({
-        title: "Newsletter Subscription Error",
-        description: "Failed to subscribe to the newsletter, but your analysis was generated.",
-        variant: "destructive",
-      });
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -97,13 +71,6 @@ export function RevenueForm({ onSubmit, isLoading, initialEmail }: RevenueFormPr
             ...formData,
             offer: updatedOffer
           });
-
-          // Subscribe to ConvertKit after successful form submission
-          await subscribeToConvertKit(formData.email, {
-            ...formData,
-            offer: updatedOffer
-          });
-          return;
         }
       } catch (error) {
         console.error('Error scraping URL:', error);
@@ -114,9 +81,6 @@ export function RevenueForm({ onSubmit, isLoading, initialEmail }: RevenueFormPr
         });
       }
     }
-    
-    // If no URL or scraping failed, proceed with ConvertKit subscription
-    await subscribeToConvertKit(formData.email, formData);
   };
 
   return (

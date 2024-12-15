@@ -18,6 +18,33 @@ const Index = () => {
     }
   }, []);
 
+  const subscribeToConvertKit = async (email: string, data: FormData, pdfUrl: string) => {
+    try {
+      const { error } = await supabase.functions.invoke('subscribe-convertkit', {
+        body: { 
+          email,
+          fields: {
+            offer_desc: data.offer,
+            ppl_ask_help_with: data.helpRequests,
+            primary_revenue_from: data.revenueSource,
+            lead_magnet: "Fastest Path to Revenue",
+            lead_magnet_link: pdfUrl
+          }
+        }
+      });
+
+      if (error) throw error;
+      console.log('Successfully subscribed to ConvertKit');
+    } catch (error) {
+      console.error('Error subscribing to ConvertKit:', error);
+      toast({
+        title: "Newsletter Subscription Error",
+        description: "Failed to subscribe to the newsletter, but your analysis was generated.",
+        variant: "destructive",
+      });
+    }
+  };
+
   const handleSubmit = async (data: FormData) => {
     setIsLoading(true);
     setAnalysis(undefined);
@@ -67,6 +94,49 @@ const Index = () => {
 
       if (response.data?.content) {
         setAnalysis(response.data.content);
+        
+        // Generate PDF and get its URL
+        const timestamp = new Date().getTime();
+        const filename = `analysis-${timestamp}.pdf`;
+        const element = document.getElementById('analysis-content');
+        
+        if (element) {
+          const pdf = await html2pdf().set({
+            margin: 1,
+            filename: 'revenue-analysis.pdf',
+            image: { type: 'jpeg', quality: 0.95 },
+            html2canvas: { 
+              scale: 1.5,
+              useCORS: true,
+              letterRendering: true
+            },
+            jsPDF: { 
+              unit: 'in', 
+              format: 'letter', 
+              orientation: 'portrait',
+              compress: true,
+              precision: 3
+            }
+          }).from(element).output('blob');
+
+          // Upload to Supabase Storage
+          const { data: uploadData, error: uploadError } = await supabase.storage
+            .from('analysis-pdfs')
+            .upload(filename, pdf, {
+              contentType: 'application/pdf',
+              cacheControl: '15780000'
+            });
+
+          if (uploadError) throw uploadError;
+
+          // Get public URL
+          const { data: { publicUrl } } = supabase.storage
+            .from('analysis-pdfs')
+            .getPublicUrl(filename);
+
+          // Subscribe to ConvertKit with the PDF URL
+          await subscribeToConvertKit(data.email, data, publicUrl);
+        }
       }
     } catch (error) {
       console.error('Error:', error);
