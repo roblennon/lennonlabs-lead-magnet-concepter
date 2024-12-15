@@ -1,8 +1,6 @@
 import { supabase } from "@/integrations/supabase/client";
-import markdownpdf from 'markdown-pdf';
-import { promisify } from 'util';
-
-const markdownToPdfAsync = promisify(markdownpdf);
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const PDF_STYLES = `
 body {
@@ -58,24 +56,32 @@ strong {
 `;
 
 export const processMarkdownForPDF = (markdown: string): string => {
-  // Clean up any existing page break markers
   return markdown.trim();
 };
 
 export const generatePDF = async (element: HTMLElement, filename: string): Promise<string> => {
   try {
-    // Get the markdown content from the element
-    const markdownContent = element.textContent || '';
-    
-    // Create a temporary file with the markdown content
-    const pdfBuffer = await markdownToPdfAsync(markdownContent, {
-      cssPath: null, // Disable default styling
-      remarkable: {
-        breaks: true,
-        html: true,
-      },
-      cssString: PDF_STYLES,
+    const canvas = await html2canvas(element, {
+      scale: 2,
+      useCORS: true,
+      logging: false,
+      windowWidth: 1200,
+      backgroundColor: '#ffffff'
     });
+
+    const imgData = canvas.toDataURL('image/jpeg', 1.0);
+    const pdf = new jsPDF('p', 'px', 'a4');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = pdf.internal.pageSize.getHeight();
+    const imgWidth = canvas.width;
+    const imgHeight = canvas.height;
+    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
+    const imgX = (pdfWidth - imgWidth * ratio) / 2;
+    const imgY = 30;
+
+    pdf.addImage(imgData, 'JPEG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+
+    const pdfBlob = pdf.output('blob');
 
     // Generate unique filename
     const timestamp = new Date().getTime();
@@ -84,7 +90,7 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
     // Upload to Supabase Storage
     const { data, error } = await supabase.storage
       .from('analysis-pdfs')
-      .upload(storageFilename, pdfBuffer, {
+      .upload(storageFilename, pdfBlob, {
         contentType: 'application/pdf',
         cacheControl: '15780000'
       });
