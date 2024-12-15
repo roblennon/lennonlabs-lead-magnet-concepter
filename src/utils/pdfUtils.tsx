@@ -2,15 +2,17 @@ import { supabase } from "@/integrations/supabase/client";
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
 import ReactMarkdown from 'react-markdown';
-import { renderToString } from 'react-dom/server';
+import { renderToStaticMarkup } from 'react-dom/server';
+import React from 'react';
 
 const PDF_STYLES = `
 body {
   font-family: 'Inter', sans-serif;
   line-height: 1.6;
   color: #374151;
-  max-width: 65ch;
-  padding: 2rem;
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 1rem 2rem;
 }
 
 h1 {
@@ -40,11 +42,13 @@ h3 {
 
 p {
   margin-bottom: 1.25rem;
+  page-break-inside: avoid;
 }
 
 ul, ol {
   margin-bottom: 1.25rem;
   padding-left: 1.5rem;
+  page-break-inside: avoid;
 }
 
 li {
@@ -55,18 +59,32 @@ strong {
   font-weight: 600;
   color: #111827;
 }
+
+@page {
+  margin: 1cm;
+  size: A4;
+}
+
+@media print {
+  body {
+    width: 21cm;
+    height: 29.7cm;
+    margin: 0;
+    padding: 1.5cm;
+  }
+}
 `;
 
 export const processMarkdownForPDF = (markdown: string): string => {
-  // Convert markdown to HTML using ReactMarkdown
-  const htmlContent = renderToString(
-    <ReactMarkdown>{markdown}</ReactMarkdown>
+  const htmlContent = renderToStaticMarkup(
+    React.createElement(ReactMarkdown, null, markdown)
   );
 
-  // Wrap the HTML content with proper styling
   return `
+    <!DOCTYPE html>
     <html>
       <head>
+        <meta charset="UTF-8">
         <style>${PDF_STYLES}</style>
       </head>
       <body>
@@ -80,33 +98,66 @@ export const processMarkdownForPDF = (markdown: string): string => {
 
 export const generatePDF = async (element: HTMLElement, filename: string): Promise<string> => {
   try {
-    const canvas = await html2canvas(element, {
+    // Create a hidden container for PDF generation
+    const container = document.createElement('div');
+    container.style.position = 'absolute';
+    container.style.left = '-9999px';
+    container.style.top = '-9999px';
+    container.innerHTML = processMarkdownForPDF(element.innerText);
+    document.body.appendChild(container);
+
+    const pdf = new jsPDF({
+      format: 'a4',
+      unit: 'pt',
+      orientation: 'portrait'
+    });
+
+    // Calculate page dimensions
+    const pageWidth = pdf.internal.pageSize.getWidth();
+    const pageHeight = pdf.internal.pageSize.getHeight();
+    const margin = 40;
+
+    // Generate PDF with multiple pages
+    const canvas = await html2canvas(container, {
       scale: 2,
       useCORS: true,
       logging: false,
-      windowWidth: 1200,
+      width: pageWidth - (margin * 2),
+      height: container.scrollHeight,
       backgroundColor: '#ffffff'
     });
 
-    const imgData = canvas.toDataURL('image/jpeg', 1.0);
-    const pdf = new jsPDF('p', 'px', 'a4');
-    const pdfWidth = pdf.internal.pageSize.getWidth();
-    const pdfHeight = pdf.internal.pageSize.getHeight();
-    const imgWidth = canvas.width;
-    const imgHeight = canvas.height;
-    const ratio = Math.min(pdfWidth / imgWidth, pdfHeight / imgHeight);
-    const imgX = (pdfWidth - imgWidth * ratio) / 2;
-    const imgY = 30;
+    const contentWidth = canvas.width;
+    const contentHeight = canvas.height;
+    const pageContentHeight = pageHeight - (margin * 2);
+    const totalPages = Math.ceil(contentHeight / pageContentHeight);
 
-    pdf.addImage(imgData, 'JPEG', imgX, imgY, imgWidth * ratio, imgHeight * ratio);
+    // Add content page by page
+    for (let i = 0; i < totalPages; i++) {
+      if (i > 0) {
+        pdf.addPage();
+      }
+
+      const srcY = i * pageContentHeight;
+      const sliceHeight = Math.min(pageContentHeight, contentHeight - srcY);
+
+      pdf.addImage(
+        canvas,
+        'JPEG',
+        margin,
+        margin + (i === 0 ? 0 : -srcY),
+        contentWidth,
+        contentHeight
+      );
+    }
+
+    // Clean up the temporary container
+    document.body.removeChild(container);
 
     const pdfBlob = pdf.output('blob');
-
-    // Generate unique filename
     const timestamp = new Date().getTime();
     const storageFilename = `${filename}-${timestamp}.pdf`;
 
-    // Upload to Supabase Storage
     const { data, error } = await supabase.storage
       .from('analysis-pdfs')
       .upload(storageFilename, pdfBlob, {
@@ -116,7 +167,6 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
 
     if (error) throw error;
 
-    // Get public URL
     const { data: { publicUrl } } = supabase.storage
       .from('analysis-pdfs')
       .getPublicUrl(storageFilename);
