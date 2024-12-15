@@ -1,6 +1,12 @@
 import { supabase } from "@/integrations/supabase/client";
 import { jsPDF } from "jspdf";
 
+type ContentType = "heading" | "paragraph" | "list";
+type ProcessedContent = {
+  type: ContentType;
+  text: string;
+};
+
 // Configure PDF fonts and styling
 const configurePDF = (pdf: jsPDF) => {
   pdf.setFont("helvetica", "normal");
@@ -12,26 +18,28 @@ const stripXMLTags = (text: string): string => {
   return text.replace(/<[^>]*>/g, '').trim();
 };
 
-const processContent = (content: string): { type: 'heading' | 'paragraph' | 'list', text: string }[] => {
+const processContent = (content: string): ProcessedContent[] => {
   // Split content by newlines and process each line
-  return content.split('\n').map(line => {
-    line = stripXMLTags(line.trim());
-    if (!line) return null;
+  return content.split('\n')
+    .map(line => {
+      line = stripXMLTags(line.trim());
+      if (!line) return null;
 
-    // Detect content type based on markdown-like patterns
-    if (line.startsWith('# ') || line.includes('Highest-Leverage') || line.includes('Key Benefits') || line.includes('Next Steps')) {
-      return { type: 'heading', text: line.replace('# ', '') };
-    } else if (line.startsWith('- ')) {
-      return { type: 'list', text: line.substring(2) };
-    } else {
-      return { type: 'paragraph', text: line };
-    }
-  }).filter(Boolean);
+      // Detect content type based on markdown-like patterns
+      if (line.startsWith('# ') || line.includes('Highest-Leverage') || line.includes('Key Benefits') || line.includes('Next Steps')) {
+        return { type: "heading" as const, text: line.replace('# ', '') };
+      } else if (line.startsWith('- ')) {
+        return { type: "list" as const, text: line.substring(2) };
+      } else {
+        return { type: "paragraph" as const, text: line };
+      }
+    })
+    .filter((item): item is ProcessedContent => item !== null);
 };
 
 const addTextWithWrapping = (
   pdf: jsPDF, 
-  content: { type: 'heading' | 'paragraph' | 'list', text: string },
+  content: ProcessedContent,
   x: number, 
   y: number, 
   maxWidth: number
@@ -82,6 +90,8 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
 
     // Get content and process it
     const rawContent = element.innerText || element.textContent;
+    if (!rawContent) throw new Error('No content found to generate PDF');
+    
     const processedContent = processContent(rawContent);
 
     let currentY = margin;
@@ -91,7 +101,7 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
     pdf.setFontSize(16);
     currentY = addTextWithWrapping(
       pdf,
-      { type: 'heading', text: "Your Fastest Paths to Revenue" },
+      { type: "heading", text: "Your Fastest Paths to Revenue" },
       margin,
       currentY,
       maxWidth
