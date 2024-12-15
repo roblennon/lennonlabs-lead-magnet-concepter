@@ -7,12 +7,8 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-const FALLBACK_MODELS = [
-  "anthropic/claude-3.5-sonnet-20240620:beta",
-  "google/gemini-exp-1206:free",
-  "x-ai/grok-beta",
-  "meta-llama/llama-3.3-70b-instruct"
-];
+// Use a single model instead of fallbacks
+const MODEL = "anthropic/claude-3.5-sonnet-20240620:beta";
 
 async function callOpenRouter(prompt: string, model: string) {
   console.log('Calling OpenRouter with model:', model);
@@ -80,27 +76,12 @@ serve(async (req) => {
     console.log('Formatted prompt with variables replaced:', formattedPrompt);
 
     let analysisContent = null;
-    let usingFallback = false;
-    let currentModelIndex = 0;
-    let lastError = null;
-
-    // Try models sequentially until one succeeds
-    while (currentModelIndex < FALLBACK_MODELS.length && !analysisContent) {
-      const currentModel = FALLBACK_MODELS[currentModelIndex];
-      try {
-        analysisContent = await callOpenRouter(formattedPrompt, currentModel);
-        usingFallback = currentModelIndex > 0; // Only true if we're using a fallback model
-        break; // Exit the loop if successful
-      } catch (error) {
-        console.error(`Model ${currentModel} failed:`, error);
-        lastError = error;
-        currentModelIndex++;
-      }
-    }
-
-    // If no model succeeded, throw the last error
-    if (!analysisContent) {
-      throw lastError || new Error('All models failed to generate analysis');
+    
+    try {
+      analysisContent = await callOpenRouter(formattedPrompt, MODEL);
+    } catch (error) {
+      console.error(`Model ${MODEL} failed:`, error);
+      throw error;
     }
 
     // Update the analysis in the database
@@ -111,7 +92,10 @@ serve(async (req) => {
     console.log('Updating analysis in database with ID:', analysisId);
     const { error: updateError } = await supabase
       .from('revenue_analyses')
-      .update({ analysis: analysisContent })
+      .update({ 
+        analysis: analysisContent,
+        successful_model: MODEL // Store the successful model
+      })
       .eq('id', analysisId);
 
     if (updateError) {
@@ -120,7 +104,7 @@ serve(async (req) => {
     }
 
     console.log('Successfully completed analysis process');
-    return new Response(JSON.stringify({ content: analysisContent, usingFallback }), {
+    return new Response(JSON.stringify({ content: analysisContent }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
 

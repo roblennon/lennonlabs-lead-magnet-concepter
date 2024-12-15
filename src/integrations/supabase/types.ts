@@ -168,6 +168,7 @@ export type Database = {
           offer: string
           prompt_id: string | null
           revenue_source: string
+          successful_model: string | null
         }
         Insert: {
           analysis?: string | null
@@ -178,6 +179,7 @@ export type Database = {
           offer: string
           prompt_id?: string | null
           revenue_source: string
+          successful_model?: string | null
         }
         Update: {
           analysis?: string | null
@@ -188,6 +190,7 @@ export type Database = {
           offer?: string
           prompt_id?: string | null
           revenue_source?: string
+          successful_model?: string | null
         }
         Relationships: [
           {
