@@ -32,7 +32,15 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
           filename: 'revenue-analysis.pdf',
           image: { type: 'jpeg', quality: 0.98 },
           html2canvas: { scale: 2 },
-          jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+          jsPDF: { 
+            unit: 'in', 
+            format: 'letter', 
+            orientation: 'portrait'
+          },
+          pagebreak: { 
+            mode: ['avoid-all', 'css', 'legacy'],
+            before: '.section-break'
+          }
         })
         .from(element)
         .save()
@@ -54,6 +62,11 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
       </div>
     );
   }
+
+  // Process the markdown to add section breaks before each heading
+  const processedAnalysis = analysis?.replace(/^(#+ )/gm, (match) => {
+    return `\n::: section-break\n${match}`;
+  });
 
   return (
     <Card className="bg-white p-8 border-border/50 h-full">
@@ -91,8 +104,8 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
               Export PDF
             </Button>
           </div>
-          <div id="analysis-content" className="prose max-w-none font-inter text-gray-700">
-            <ReactMarkdown>{analysis}</ReactMarkdown>
+          <div id="analysis-content" className="prose max-w-none font-inter text-gray-700 [&_.section-break]:break-before-page">
+            <ReactMarkdown>{processedAnalysis}</ReactMarkdown>
           </div>
         </div>
       )}
