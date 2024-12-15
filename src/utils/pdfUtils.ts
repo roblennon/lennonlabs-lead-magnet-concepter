@@ -2,8 +2,8 @@ import html2pdf from 'html2pdf.js';
 import { supabase } from "@/integrations/supabase/client";
 
 const PDF_FOOTER_HTML = `
-<div style="position: fixed; bottom: 0; left: 0; right: 0; padding: 1rem; display: flex; align-items: center; gap: 0.5rem; color: #71717a; font-family: Inter, sans-serif; font-size: 0.875rem;">
-  <img src="/lovable-uploads/03da23fe-9a53-4fbe-b9d9-1ee4f1589282.png" style="height: 20px; width: 20px;" />
+<div style="position: fixed; bottom: 0; left: 0; right: 0; padding: 1rem; border-top: 1px solid #3e3a45; background-color: white; display: flex; align-items: center; gap: 0.5rem; color: #71717a; font-family: Inter, sans-serif; font-size: 0.875rem;">
+  <img src="https://lennonlabs-revenue-finder.lovable.app/lovable-uploads/03da23fe-9a53-4fbe-b9d9-1ee4f1589282.png" style="height: 20px; width: 20px;" />
   <span>Made with</span>
   <span style="color: #ef4444;">❤️</span>
   <span>by Rob Lennon |</span>
@@ -12,83 +12,143 @@ const PDF_FOOTER_HTML = `
 `;
 
 export const processMarkdownForPDF = (markdown: string): string => {
-  // Process the markdown to add page breaks before H2 headings
-  const processedContent = markdown.replace(/^## /gm, '<div class="page-break"></div>\n## ');
-  
-  // Add extra spacing between H2 and H3
-  return processedContent.replace(/^### /gm, '<div class="h3-spacing"></div>\n### ');
+  // Process the markdown content
+  return markdown;
 };
 
 export const generatePDF = async (element: HTMLElement, filename: string) => {
   const timestamp = new Date().getTime();
   const storageFilename = `${filename}-${timestamp}.pdf`;
   
+  // Create a temporary container with proper styling
+  const container = document.createElement('div');
+  container.className = 'pdf-container';
+  
+  // Copy the content from the original element
+  container.innerHTML = element.innerHTML;
+  
   // Add necessary styles for PDF generation
   const styleSheet = document.createElement('style');
   styleSheet.textContent = `
-    .page-break { page-break-before: always; }
-    .h3-spacing { margin-top: 1.5rem; }
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    
+    .pdf-container {
+      font-family: 'Inter', sans-serif;
+      color: #374151;
+      line-height: 1.6;
+      padding: 1in 1in 1.5in 1in;
+    }
+    
+    h1 {
+      font-size: 2.25rem;
+      font-weight: 700;
+      margin-bottom: 1.5rem;
+      color: #111827;
+    }
+    
+    h2 {
+      font-size: 1.875rem;
+      font-weight: 600;
+      margin-top: 2rem;
+      margin-bottom: 1rem;
+      color: #1f2937;
+      page-break-before: always;
+    }
+    
+    h2:first-of-type {
+      page-break-before: avoid;
+    }
+    
+    h3 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      margin-top: 2rem;
+      margin-bottom: 0.75rem;
+      color: #374151;
+    }
+    
+    p {
+      margin-bottom: 1rem;
+      font-size: 1rem;
+    }
+    
+    ul, ol {
+      margin-bottom: 1rem;
+      padding-left: 1.5rem;
+    }
+    
+    li {
+      margin-bottom: 0.5rem;
+    }
+    
+    strong {
+      font-weight: 600;
+      color: #111827;
+    }
+    
     @page {
-      margin: 1in;
+      margin: 0;
       padding: 0;
-      background: transparent;
     }
   `;
-  element.appendChild(styleSheet);
   
-  // Create optimized PDF
-  const pdf = await html2pdf().set({
-    margin: [0.75, 0.75, 1.25, 0.75], // top, right, bottom, left (in inches)
-    filename: 'revenue-analysis.pdf',
-    image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: { 
-      scale: 2,
-      useCORS: true,
-      letterRendering: true,
-      backgroundColor: null // Make background transparent
-    },
-    jsPDF: { 
-      unit: 'in', 
-      format: 'letter', 
-      orientation: 'portrait',
-      compress: true,
-      precision: 3
-    },
-    pagebreak: { 
-      mode: ['css', 'legacy'],
-      before: '.page-break'
-    },
-    footer: {
-      height: '1.25in',
-      contents: {
-        default: PDF_FOOTER_HTML
-      }
-    }
-  }).from(element).output('blob');
-
+  container.appendChild(styleSheet);
+  document.body.appendChild(container);
+  
   try {
+    // Generate PDF with optimized settings
+    const pdf = await html2pdf().set({
+      margin: 0,
+      filename: 'revenue-analysis.pdf',
+      image: { type: 'jpeg', quality: 0.98 },
+      html2canvas: { 
+        scale: 2,
+        useCORS: true,
+        letterRendering: true,
+        backgroundColor: null,
+        logging: true,
+        removeContainer: true
+      },
+      jsPDF: { 
+        unit: 'in', 
+        format: 'letter', 
+        orientation: 'portrait',
+        compress: true,
+        precision: 3
+      },
+      pagebreak: { mode: 'css' },
+      footer: {
+        height: '1.5in',
+        contents: {
+          default: PDF_FOOTER_HTML
+        }
+      }
+    }).from(container).output('blob');
+
     // Upload to Supabase Storage
-    const { data, error } = await supabase.storage
+    const { data, error: uploadError } = await supabase.storage
       .from('analysis-pdfs')
       .upload(storageFilename, pdf, {
         contentType: 'application/pdf',
         cacheControl: '15780000'
       });
 
-    if (error) throw error;
+    if (uploadError) throw uploadError;
 
     // Get public URL
     const { data: { publicUrl } } = supabase.storage
       .from('analysis-pdfs')
       .getPublicUrl(storageFilename);
 
-    // Clean up temporary styles
-    element.removeChild(styleSheet);
+    // Clean up
+    document.body.removeChild(container);
     
     return publicUrl;
   } catch (error) {
-    // Clean up temporary styles even if there's an error
-    element.removeChild(styleSheet);
+    // Clean up on error
+    if (document.body.contains(container)) {
+      document.body.removeChild(container);
+    }
     console.error('Error saving PDF:', error);
     throw error;
   }
