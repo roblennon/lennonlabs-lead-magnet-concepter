@@ -1,76 +1,90 @@
-import html2pdf from 'html2pdf.js';
 import { supabase } from "@/integrations/supabase/client";
+import markdownpdf from 'markdown-pdf';
+import { promisify } from 'util';
 
-const PDF_FOOTER_HTML = `
-<div style="position: fixed; bottom: 0; left: 0; right: 0; padding: 1rem; display: flex; align-items: center; gap: 0.5rem; color: #71717a; font-family: Inter, sans-serif; font-size: 0.875rem;">
-  <img src="/lovable-uploads/03da23fe-9a53-4fbe-b9d9-1ee4f1589282.png" style="height: 20px; width: 20px;" />
-  <span>Made with</span>
-  <span style="color: #ef4444;">❤️</span>
-  <span>by Rob Lennon |</span>
-  <a href="https://lennonlabs.com" style="color: #eab308; text-decoration: none;">lennonlabs.com</a>
-</div>
+const markdownToPdfAsync = promisify(markdownpdf);
+
+const PDF_STYLES = `
+body {
+  font-family: 'Inter', sans-serif;
+  line-height: 1.6;
+  color: #374151;
+  max-width: 65ch;
+  padding: 2rem;
+}
+
+h1 {
+  font-size: 2.25rem;
+  font-weight: 700;
+  margin-top: 2rem;
+  margin-bottom: 1rem;
+  color: #111827;
+}
+
+h2 {
+  font-size: 1.875rem;
+  font-weight: 600;
+  margin-top: 3rem;
+  margin-bottom: 1rem;
+  color: #1F2937;
+  page-break-before: always;
+}
+
+h3 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.75rem;
+  color: #374151;
+}
+
+p {
+  margin-bottom: 1.25rem;
+}
+
+ul, ol {
+  margin-bottom: 1.25rem;
+  padding-left: 1.5rem;
+}
+
+li {
+  margin-bottom: 0.5rem;
+}
+
+strong {
+  font-weight: 600;
+  color: #111827;
+}
 `;
 
 export const processMarkdownForPDF = (markdown: string): string => {
-  // Process the markdown to add page breaks before H2 headings
-  const processedContent = markdown.replace(/^## /gm, '<div class="page-break"></div>\n## ');
-  
-  // Add extra spacing between H2 and H3
-  return processedContent.replace(/^### /gm, '<div class="h3-spacing"></div>\n### ');
+  // Clean up any existing page break markers
+  return markdown.trim();
 };
 
-export const generatePDF = async (element: HTMLElement, filename: string) => {
-  const timestamp = new Date().getTime();
-  const storageFilename = `${filename}-${timestamp}.pdf`;
-  
-  // Add necessary styles for PDF generation
-  const styleSheet = document.createElement('style');
-  styleSheet.textContent = `
-    .page-break { page-break-before: always; }
-    .h3-spacing { margin-top: 1.5rem; }
-    @page {
-      margin: 1in;
-      padding: 0;
-      background: transparent;
-    }
-  `;
-  element.appendChild(styleSheet);
-  
-  // Create optimized PDF
-  const pdf = await html2pdf().set({
-    margin: [0.75, 0.75, 1.25, 0.75], // top, right, bottom, left (in inches)
-    filename: 'revenue-analysis.pdf',
-    image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: { 
-      scale: 2,
-      useCORS: true,
-      letterRendering: true,
-      backgroundColor: null // Make background transparent
-    },
-    jsPDF: { 
-      unit: 'in', 
-      format: 'letter', 
-      orientation: 'portrait',
-      compress: true,
-      precision: 3
-    },
-    pagebreak: { 
-      mode: ['css', 'legacy'],
-      before: '.page-break'
-    },
-    footer: {
-      height: '1.25in',
-      contents: {
-        default: PDF_FOOTER_HTML
-      }
-    }
-  }).from(element).output('blob');
-
+export const generatePDF = async (element: HTMLElement, filename: string): Promise<string> => {
   try {
+    // Get the markdown content from the element
+    const markdownContent = element.textContent || '';
+    
+    // Create a temporary file with the markdown content
+    const pdfBuffer = await markdownToPdfAsync(markdownContent, {
+      cssPath: null, // Disable default styling
+      remarkable: {
+        breaks: true,
+        html: true,
+      },
+      cssString: PDF_STYLES,
+    });
+
+    // Generate unique filename
+    const timestamp = new Date().getTime();
+    const storageFilename = `${filename}-${timestamp}.pdf`;
+
     // Upload to Supabase Storage
     const { data, error } = await supabase.storage
       .from('analysis-pdfs')
-      .upload(storageFilename, pdf, {
+      .upload(storageFilename, pdfBuffer, {
         contentType: 'application/pdf',
         cacheControl: '15780000'
       });
@@ -82,14 +96,9 @@ export const generatePDF = async (element: HTMLElement, filename: string) => {
       .from('analysis-pdfs')
       .getPublicUrl(storageFilename);
 
-    // Clean up temporary styles
-    element.removeChild(styleSheet);
-    
     return publicUrl;
   } catch (error) {
-    // Clean up temporary styles even if there's an error
-    element.removeChild(styleSheet);
-    console.error('Error saving PDF:', error);
+    console.error('Error generating PDF:', error);
     throw error;
   }
 };
