@@ -30,18 +30,18 @@ function normalizeUrl(url: string): string {
 
 function isValidUrl(url: string): boolean {
   try {
-    // Basic URL pattern
-    const urlPattern = /^[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/;
+    // First normalize the URL
+    const normalizedUrl = normalizeUrl(url);
     
-    // If it's already a full URL, validate it
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      new URL(url);
-      return true;
-    }
+    // Try to construct a URL object - this will validate the URL format
+    new URL(normalizedUrl);
     
-    // If it's just a domain, check against our pattern
-    return urlPattern.test(url);
+    // Additional validation if needed
+    const hostname = new URL(normalizedUrl).hostname;
+    // Ensure the hostname has at least one dot and a valid TLD
+    return hostname.includes('.') && /^[a-zA-Z0-9-_.]+$/.test(hostname);
   } catch {
+    console.error('Invalid URL format:', url);
     return false;
   }
 }
@@ -56,14 +56,18 @@ serve(async (req) => {
     const { url } = await req.json() as RequestBody;
 
     if (!url) {
+      console.error('No URL provided');
       return new Response(
         JSON.stringify({ error: 'URL is required' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       );
     }
 
+    console.log('Received URL:', url);
+
     // Check if the input looks like a URL
     if (!isValidUrl(url)) {
+      console.error('Invalid URL format:', url);
       return new Response(
         JSON.stringify({ error: 'Invalid URL format' }),
         { status: 400, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
@@ -71,7 +75,7 @@ serve(async (req) => {
     }
 
     const normalizedUrl = normalizeUrl(url);
-    console.log('Fetching URL:', normalizedUrl);
+    console.log('Normalized URL:', normalizedUrl);
 
     // Fetch the webpage content
     const response = await fetch(normalizedUrl, {
@@ -113,7 +117,7 @@ serve(async (req) => {
       .filter(sentence => sentence.trim().length > 0)
       .map(sentence => sentence.trim() + '.')
       .join('\n\n')
-      .substring(0, 20000); // Increased to 20,000 characters
+      .substring(0, 20000); // Limit to 20,000 characters
 
     console.log('Successfully extracted content from URL');
 
