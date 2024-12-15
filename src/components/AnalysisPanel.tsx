@@ -4,6 +4,7 @@ import { Copy, Download, Loader2 } from "lucide-react";
 import ReactMarkdown from 'react-markdown';
 import { useToast } from "@/hooks/use-toast";
 import html2pdf from 'html2pdf.js';
+import { supabase } from "@/integrations/supabase/client";
 
 interface AnalysisPanelProps {
   isLoading?: boolean;
@@ -23,33 +24,73 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
     }
   };
 
-  const exportToPDF = () => {
+  const exportToPDF = async () => {
     if (analysis) {
       const element = document.getElementById('analysis-content');
-      html2pdf()
-        .set({
-          margin: 1,
-          filename: 'revenue-analysis.pdf',
-          image: { type: 'jpeg', quality: 0.98 },
-          html2canvas: { scale: 2 },
-          jsPDF: { 
-            unit: 'in', 
-            format: 'letter', 
-            orientation: 'portrait'
-          },
-          pagebreak: { 
-            mode: ['avoid-all', 'css', 'legacy'],
-            before: '.section-break'
-          }
-        })
-        .from(element)
-        .save()
-        .then(() => {
-          toast({
-            title: "Downloaded!",
-            description: "Analysis saved as PDF",
+      
+      // Create optimized PDF
+      const pdf = await html2pdf().set({
+        margin: 1,
+        filename: 'revenue-analysis.pdf',
+        image: { type: 'jpeg', quality: 0.95 }, // Slightly reduced image quality
+        html2canvas: { 
+          scale: 1.5, // Reduced from 2 to 1.5 for better file size
+          useCORS: true,
+          letterRendering: true
+        },
+        jsPDF: { 
+          unit: 'in', 
+          format: 'letter', 
+          orientation: 'portrait',
+          compress: true, // Enable compression
+          precision: 3 // Reduce precision for smaller file size
+        },
+        pagebreak: { 
+          mode: ['avoid-all', 'css', 'legacy'],
+          before: '.section-break'
+        }
+      }).from(element).output('blob');
+
+      // Generate unique filename
+      const timestamp = new Date().getTime();
+      const filename = `analysis-${timestamp}.pdf`;
+
+      try {
+        // Upload to Supabase Storage
+        const { data, error } = await supabase.storage
+          .from('analysis-pdfs')
+          .upload(filename, pdf, {
+            contentType: 'application/pdf',
+            cacheControl: '15780000' // 6 months cache
           });
+
+        if (error) throw error;
+
+        // Get public URL
+        const { data: { publicUrl } } = supabase.storage
+          .from('analysis-pdfs')
+          .getPublicUrl(filename);
+
+        // Download the file
+        const link = document.createElement('a');
+        link.href = publicUrl;
+        link.download = 'revenue-analysis.pdf';
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        toast({
+          title: "Downloaded!",
+          description: "Analysis saved as PDF",
         });
+      } catch (error) {
+        console.error('Error saving PDF:', error);
+        toast({
+          title: "Error",
+          description: "Failed to save PDF. Please try again.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
