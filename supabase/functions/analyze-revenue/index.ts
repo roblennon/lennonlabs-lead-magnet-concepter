@@ -8,7 +8,10 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
-// Use a single model instead of fallbacks
+// ⚠️ IMPORTANT: We use a single model to prevent multiple LLM calls
+// DO NOT reintroduce fallback logic that could trigger multiple API calls
+// If the model fails, let it fail and handle the error appropriately
+// Previous versions had a bug where fallback logic caused duplicate LLM calls
 const MODEL = "anthropic/claude-3.5-sonnet-20240620:beta";
 
 async function callOpenRouter(prompt: string, model: string) {
@@ -31,8 +34,8 @@ async function callOpenRouter(prompt: string, model: string) {
           content: prompt
         }
       ],
-      max_tokens: 4000, // Increased max tokens for longer responses
-      temperature: 0.7 // Slightly reduced temperature for more focused responses
+      max_tokens: 4000,
+      temperature: 0.7
     }),
   });
 
