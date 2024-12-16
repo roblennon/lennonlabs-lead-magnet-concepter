@@ -8,15 +8,16 @@ const corsHeaders = {
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
 };
 
-// ⚠️ IMPORTANT: We use a single model to prevent multiple LLM calls
-// DO NOT reintroduce fallback logic that could trigger multiple API calls
-// If the model fails, let it fail and handle the error appropriately
-// Previous versions had a bug where fallback logic caused duplicate LLM calls
-const MODEL = "anthropic/claude-3.5-sonnet-20240620:beta";
+// Define models in order of preference
+const MODELS = [
+  "anthropic/claude-3.5-sonnet-20240620:beta",
+  "google/gemini-2.0-flash-exp:free",
+  "x-ai/grok-2-1212",
+  "meta-llama/llama-3.3-70b-instruct"
+];
 
 async function callOpenRouter(prompt: string, model: string) {
-  console.log('Calling OpenRouter with model:', model);
-  console.log('Using prompt:', prompt);
+  console.log('Attempting to call OpenRouter with model:', model);
   
   const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
     method: 'POST',
@@ -65,6 +66,26 @@ async function callOpenRouter(prompt: string, model: string) {
   return result.choices[0].message.content;
 }
 
+async function tryModelsSequentially(prompt: string): Promise<{ content: string, model: string }> {
+  let lastError = null;
+  
+  for (const model of MODELS) {
+    try {
+      console.log(`Attempting to use model: ${model}`);
+      const content = await callOpenRouter(prompt, model);
+      console.log(`Successfully generated content using ${model}`);
+      return { content, model };
+    } catch (error) {
+      console.error(`Failed to use model ${model}:`, error);
+      lastError = error;
+      continue; // Try next model
+    }
+  }
+  
+  // If we get here, all models failed
+  throw new Error(`All models failed. Last error: ${lastError?.message}`);
+}
+
 serve(async (req) => {
   // Handle CORS preflight requests
   if (req.method === 'OPTIONS') {
@@ -75,12 +96,6 @@ serve(async (req) => {
   }
 
   try {
-    // Log the incoming request
-    console.log('Received request:', {
-      method: req.method,
-      headers: Object.fromEntries(req.headers.entries())
-    });
-
     const { analysisId, prompt, data } = await req.json();
     console.log('Raw request data:', { analysisId, prompt, data });
 
@@ -95,17 +110,9 @@ serve(async (req) => {
 
     console.log('Formatted prompt with variables replaced:', formattedPrompt);
 
-    let analysisContent = null;
+    // Try models sequentially until one succeeds
+    const { content: analysisContent, model: successfulModel } = await tryModelsSequentially(formattedPrompt);
     
-    try {
-      analysisContent = await callOpenRouter(formattedPrompt, MODEL);
-      console.log('Successfully generated analysis content');
-      console.log('Analysis content length:', analysisContent.length);
-    } catch (error) {
-      console.error(`Model ${MODEL} failed:`, error);
-      throw error;
-    }
-
     // Update the analysis in the database
     const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
     const supabaseKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
@@ -116,7 +123,7 @@ serve(async (req) => {
       .from('revenue_analyses')
       .update({ 
         analysis: analysisContent,
-        successful_model: MODEL
+        successful_model: successfulModel
       })
       .eq('id', analysisId);
 
@@ -127,7 +134,10 @@ serve(async (req) => {
 
     console.log('Successfully completed analysis process');
     return new Response(
-      JSON.stringify({ content: analysisContent }), 
+      JSON.stringify({ 
+        content: analysisContent,
+        model: successfulModel
+      }), 
       {
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
         status: 200
