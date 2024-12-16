@@ -41,46 +41,10 @@ export function RevenueForm({ onSubmit, isLoading, initialEmail }: RevenueFormPr
     return urlPattern.test(text.trim());
   };
 
-  const subscribeToConvertKit = async (email: string, data: FormData, pdfUrl: string) => {
-    try {
-      const { error } = await supabase.functions.invoke('subscribe-convertkit', {
-        body: { 
-          email,
-          fields: {
-            offer_desc: data.offer,
-            ppl_ask_help_with: data.helpRequests,
-            primary_revenue_from: data.revenueSource,
-            lead_magnet: "Fastest Path to Revenue",
-            lead_magnet_link: pdfUrl
-          }
-        }
-      });
-
-      if (error) throw error;
-      
-      toast({
-        title: "Success!",
-        description: "You've been subscribed to the newsletter.",
-      });
-      
-      console.log('Successfully subscribed to ConvertKit');
-    } catch (error) {
-      console.error('Error subscribing to ConvertKit:', error);
-      toast({
-        title: "Newsletter Subscription Error",
-        description: "Failed to subscribe to the newsletter, but your analysis was generated.",
-        variant: "destructive",
-      });
-    }
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
-    // Set loading state immediately through parent component
-    onSubmit(formData);
-    
-    // Check if the offer field contains a URL
+    // If it's a URL, scrape it first
     if (isValidUrl(formData.offer)) {
       try {
         const { data, error } = await supabase.functions.invoke('scrape-url', {
@@ -90,20 +54,21 @@ export function RevenueForm({ onSubmit, isLoading, initialEmail }: RevenueFormPr
         if (error) throw error;
         
         if (data.content) {
-          // Append the scraped content to any existing content
-          const updatedOffer = formData.offer + "\n\n" + data.content;
-          setFormData(prev => ({ ...prev, offer: updatedOffer }));
+          // Update the form data with scraped content
+          const updatedFormData = {
+            ...formData,
+            offer: formData.offer + "\n\n" + data.content
+          };
+          setFormData(updatedFormData);
           
           toast({
             title: "Website content extracted",
             description: "Successfully analyzed your website content.",
           });
           
-          // Submit the form with the updated offer
-          onSubmit({
-            ...formData,
-            offer: updatedOffer
-          });
+          // Submit the updated form data
+          onSubmit(updatedFormData);
+          return;
         }
       } catch (error) {
         console.error('Error scraping URL:', error);
@@ -114,6 +79,9 @@ export function RevenueForm({ onSubmit, isLoading, initialEmail }: RevenueFormPr
         });
       }
     }
+    
+    // Submit the form with current data if not a URL or if scraping failed
+    onSubmit(formData);
   };
 
   return (
