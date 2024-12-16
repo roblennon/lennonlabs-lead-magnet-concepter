@@ -5,16 +5,19 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
   try {
     // Create a temporary container for styling
     const container = document.createElement('div');
-    container.style.padding = '40px';
-    container.style.maxWidth = '800px'; // Ensure content has reasonable width
+    container.style.padding = '48px'; // Increased padding to ensure content stays within safe area
+    container.style.maxWidth = '700px'; // Slightly reduced to account for margins
     container.style.margin = '0 auto';
     container.style.fontFamily = 'Arial, sans-serif';
     container.style.fontSize = '12pt';
     container.style.lineHeight = '1.6';
     container.style.color = '#000';
+    container.style.boxSizing = 'border-box'; // Ensure padding is included in width calculation
 
     // Get the content and apply styling
     const content = element.cloneNode(true) as HTMLElement;
+    content.style.width = '100%'; // Ensure content respects container width
+    content.style.overflow = 'visible'; // Allow content to flow naturally
     
     // Style headings
     content.querySelectorAll('h1').forEach(h1 => {
@@ -22,7 +25,7 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
       h1.style.fontWeight = 'bold';
       h1.style.marginBottom = '20px';
       h1.style.color = '#000';
-      h1.style.wordWrap = 'break-word'; // Ensure text wraps
+      h1.style.wordWrap = 'break-word';
     });
 
     content.querySelectorAll('h2').forEach(h2 => {
@@ -49,7 +52,8 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
       p.style.fontSize = '12pt';
       p.style.color = '#000';
       p.style.wordWrap = 'break-word';
-      p.style.whiteSpace = 'pre-wrap'; // Preserve whitespace and wrap
+      p.style.whiteSpace = 'pre-wrap';
+      p.style.width = '100%'; // Ensure paragraphs respect container width
     });
 
     // Style lists
@@ -57,7 +61,8 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
       ul.style.marginLeft = '20px';
       ul.style.marginBottom = '15px';
       ul.style.listStyleType = 'disc';
-      ul.style.paddingRight = '20px'; // Add right padding for list items
+      ul.style.paddingRight = '20px';
+      ul.style.width = 'calc(100% - 40px)'; // Account for left margin and right padding
     });
 
     content.querySelectorAll('li').forEach(li => {
@@ -72,7 +77,7 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
 
     // Generate PDF with specific settings
     const pdfOptions = {
-      margin: [20, 20, 20, 20], // Slightly increased margins
+      margin: [25, 25, 25, 25], // Increased margins for safety
       filename: 'revenue-analysis.pdf',
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
@@ -80,15 +85,17 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
         useCORS: true,
         letterRendering: true,
         logging: false,
-        windowWidth: 1200, // Set a fixed width for consistent rendering
-        scrollY: -window.scrollY, // Fix for scrolled content
+        windowWidth: 1200,
+        scrollY: -window.scrollY,
+        width: 800, // Fixed width for consistent rendering
+        height: undefined, // Let height adjust automatically
       },
       jsPDF: { 
         unit: 'mm', 
         format: 'a4', 
         orientation: 'portrait',
         compress: true,
-        hotfixes: ['px_scaling'], // Fix potential scaling issues
+        hotfixes: ['px_scaling'],
       }
     };
 
