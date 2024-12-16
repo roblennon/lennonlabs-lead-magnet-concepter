@@ -5,19 +5,18 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
   try {
     // Create a temporary container for styling
     const container = document.createElement('div');
-    container.style.padding = '48px'; // Increased padding to ensure content stays within safe area
-    container.style.maxWidth = '700px'; // Slightly reduced to account for margins
+    container.style.padding = '15mm'; // Match PDF margins for visual consistency
+    container.style.maxWidth = '180mm'; // A4 width (210mm) minus margins (30mm)
     container.style.margin = '0 auto';
     container.style.fontFamily = 'Arial, sans-serif';
     container.style.fontSize = '12pt';
     container.style.lineHeight = '1.6';
     container.style.color = '#000';
-    container.style.boxSizing = 'border-box'; // Ensure padding is included in width calculation
 
     // Get the content and apply styling
     const content = element.cloneNode(true) as HTMLElement;
-    content.style.width = '100%'; // Ensure content respects container width
-    content.style.overflow = 'visible'; // Allow content to flow naturally
+    content.style.width = '100%';
+    content.style.pageBreakInside = 'auto'; // Allow proper page breaks
     
     // Style headings
     content.querySelectorAll('h1').forEach(h1 => {
@@ -25,7 +24,7 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
       h1.style.fontWeight = 'bold';
       h1.style.marginBottom = '20px';
       h1.style.color = '#000';
-      h1.style.wordWrap = 'break-word';
+      h1.style.pageBreakAfter = 'avoid'; // Prevent orphaned headings
     });
 
     content.querySelectorAll('h2').forEach(h2 => {
@@ -34,7 +33,7 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
       h2.style.marginTop = '25px';
       h2.style.marginBottom = '15px';
       h2.style.color = '#000';
-      h2.style.wordWrap = 'break-word';
+      h2.style.pageBreakAfter = 'avoid';
     });
 
     content.querySelectorAll('h3').forEach(h3 => {
@@ -43,7 +42,7 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
       h3.style.marginTop = '20px';
       h3.style.marginBottom = '10px';
       h3.style.color = '#000';
-      h3.style.wordWrap = 'break-word';
+      h3.style.pageBreakAfter = 'avoid';
     });
 
     // Style paragraphs
@@ -51,9 +50,7 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
       p.style.marginBottom = '12px';
       p.style.fontSize = '12pt';
       p.style.color = '#000';
-      p.style.wordWrap = 'break-word';
-      p.style.whiteSpace = 'pre-wrap';
-      p.style.width = '100%'; // Ensure paragraphs respect container width
+      p.style.pageBreakInside = 'avoid'; // Try to keep paragraphs together
     });
 
     // Style lists
@@ -61,15 +58,13 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
       ul.style.marginLeft = '20px';
       ul.style.marginBottom = '15px';
       ul.style.listStyleType = 'disc';
-      ul.style.paddingRight = '20px';
-      ul.style.width = 'calc(100% - 40px)'; // Account for left margin and right padding
+      ul.style.pageBreakInside = 'avoid'; // Keep list items together when possible
     });
 
     content.querySelectorAll('li').forEach(li => {
       li.style.marginBottom = '8px';
       li.style.fontSize = '12pt';
       li.style.color = '#000';
-      li.style.wordWrap = 'break-word';
     });
 
     // Add the styled content to the container
@@ -77,7 +72,7 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
 
     // Generate PDF with specific settings
     const pdfOptions = {
-      margin: [25, 25, 25, 25], // Increased margins for safety
+      margin: [15, 15, 15, 15], // 15mm margins on all sides
       filename: 'revenue-analysis.pdf',
       image: { type: 'jpeg', quality: 0.98 },
       html2canvas: { 
@@ -85,10 +80,8 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
         useCORS: true,
         letterRendering: true,
         logging: false,
-        windowWidth: 1200,
+        windowWidth: undefined, // Let it calculate based on content
         scrollY: -window.scrollY,
-        width: 800, // Fixed width for consistent rendering
-        height: undefined, // Let height adjust automatically
       },
       jsPDF: { 
         unit: 'mm', 
@@ -96,6 +89,7 @@ export const generatePDF = async (element: HTMLElement, filename: string): Promi
         orientation: 'portrait',
         compress: true,
         hotfixes: ['px_scaling'],
+        putTotalPages: true
       }
     };
 
