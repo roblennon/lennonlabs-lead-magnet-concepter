@@ -153,12 +153,12 @@ const Index = () => {
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
 
-      <main className="flex-1 container mx-auto px-8 py-8">
-        <div className="grid grid-cols-12 gap-8">
-          <div className="col-span-5 bg-card rounded-lg shadow-lg border border-border/30">
+      <main className="flex-1 container mx-auto px-4 sm:px-8 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          <div className="lg:col-span-5 bg-card rounded-lg shadow-lg border border-border/30">
             <RevenueForm onSubmit={handleSubmit} isLoading={isLoading} initialEmail={initialEmail} />
           </div>
-          <div className="col-span-7 bg-card rounded-lg shadow-lg border border-border/30">
+          <div className="lg:col-span-7 bg-card rounded-lg shadow-lg border border-border/30">
             <AnalysisPanel isLoading={isLoading} analysis={analysis} />
           </div>
         </div>
