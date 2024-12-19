@@ -3,6 +3,7 @@ import { RevenueForm, FormData } from "@/components/RevenueForm";
 import { AnalysisPanel } from "@/components/AnalysisPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import html2pdf from 'html2pdf.js';
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
@@ -55,6 +56,8 @@ const Index = () => {
         .insert({
           email: data.email,
           offer: data.offer,
+          help_requests: "lead_magnet_generation", // Adding required field
+          revenue_source: "not_applicable", // Adding required field
         })
         .select()
         .single();
