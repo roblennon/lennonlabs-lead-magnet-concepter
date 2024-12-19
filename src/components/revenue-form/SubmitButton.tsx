@@ -11,7 +11,7 @@ export function SubmitButton({ isLoading }: SubmitButtonProps) {
       className="w-full bg-primary text-primary-foreground hover:bg-primary/90 h-12 text-base font-medium"
       disabled={isLoading}
     >
-      {isLoading ? "Generating..." : "Generate Lead Magnet Ideas"}
+      {isLoading ? "Generating Ideas..." : "Generate Lead Magnet Ideas"}
     </Button>
   );
 }
