@@ -63,7 +63,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
 
   if (!analysis && !isLoading) {
     return (
-      <div className="flex items-center justify-center h-full bg-white text-gray-700 p-8">
+      <div className="flex items-center justify-center h-full bg-white text-gray-700 p-4 sm:p-8">
         <p className="text-center text-base font-inter">
           Fill out the form to receive your personalized revenue opportunity analysis.
         </p>
@@ -72,7 +72,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
   }
 
   return (
-    <Card className="bg-white p-8 border-border/50 h-full overflow-auto">
+    <Card className="bg-white p-4 sm:p-8 border-border/50 h-full overflow-auto">
       {isLoading ? (
         <div className="flex flex-col items-center justify-center h-full gap-4">
           <div className="relative">

@@ -13,7 +13,8 @@ export function AnalysisContent({ content }: AnalysisContentProps) {
         prose-slate 
         max-w-[180mm] 
         mx-auto 
-        p-8 
+        p-4 
+        sm:p-8 
         font-inter 
         prose-headings:text-[#333333] 
         prose-headings:font-semibold 
@@ -32,7 +33,7 @@ export function AnalysisContent({ content }: AnalysisContentProps) {
         prose-h3:mb-4
         prose-strong:text-[#333333]
         prose-strong:font-semibold
-        prose-a:text-[#F1C40F]
+        prose-a:text-[#6E59A5]
         prose-a:no-underline
         prose-a:font-medium
         [&>h3]:mt-8
@@ -49,14 +50,14 @@ export function AnalysisContent({ content }: AnalysisContentProps) {
           href="https://lennonlabs.com" 
           target="_blank" 
           rel="noopener noreferrer"
-          className="flex items-center space-x-2 no-underline"
+          className="flex items-center space-x-2 no-underline group"
         >
           <img 
             src="/lovable-uploads/03da23fe-9a53-4fbe-b9d9-1ee4f1589282.png" 
             alt="Lennon Labs Logo" 
             className="h-10 w-10"
           />
-          <span className="text-[#333333] font-medium hover:text-[#F1C40F] transition-colors">
+          <span className="text-[#6E59A5] font-medium group-hover:text-[#7E69AB] transition-colors">
             Lennon Labs
           </span>
         </a>
