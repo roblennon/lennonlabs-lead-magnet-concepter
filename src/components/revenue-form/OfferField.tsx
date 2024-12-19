@@ -14,7 +14,7 @@ export function OfferField({ value, onChange }: OfferFieldProps) {
       </Label>
       <Textarea
         id="offer"
-        placeholder="e.g. website.com or paste some marketing stuff"
+        placeholder="e.g. website.com or tell us about your business, target audience, and what you sell"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         className="min-h-[120px] bg-card border-border/50 text-foreground placeholder:text-muted/60"

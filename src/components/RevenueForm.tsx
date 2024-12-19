@@ -1,8 +1,6 @@
 import { useState, useEffect } from "react";
 import { EmailField } from "./revenue-form/EmailField";
 import { OfferField } from "./revenue-form/OfferField";
-import { RevenueSourceField } from "./revenue-form/RevenueSourceField";
-import { HelpRequestsField } from "./revenue-form/HelpRequestsField";
 import { SubmitButton } from "./revenue-form/SubmitButton";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -10,8 +8,6 @@ import { supabase } from "@/integrations/supabase/client";
 export type FormData = {
   email: string;
   offer: string;
-  revenueSource: string;
-  helpRequests: string;
 };
 
 interface RevenueFormProps {
@@ -24,8 +20,6 @@ export function RevenueForm({ onSubmit, isLoading, initialEmail }: RevenueFormPr
   const [formData, setFormData] = useState<FormData>({
     email: initialEmail || "",
     offer: "",
-    revenueSource: "services",
-    helpRequests: "",
   });
   const { toast } = useToast();
 
@@ -89,16 +83,6 @@ export function RevenueForm({ onSubmit, isLoading, initialEmail }: RevenueFormPr
       <OfferField
         value={formData.offer}
         onChange={(value) => setFormData(prev => ({ ...prev, offer: value }))}
-      />
-      
-      <RevenueSourceField
-        value={formData.revenueSource}
-        onChange={(value) => setFormData(prev => ({ ...prev, revenueSource: value }))}
-      />
-      
-      <HelpRequestsField
-        value={formData.helpRequests}
-        onChange={(value) => setFormData(prev => ({ ...prev, helpRequests: value }))}
       />
       
       <div>

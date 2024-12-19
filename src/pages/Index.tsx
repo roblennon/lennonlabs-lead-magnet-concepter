@@ -3,7 +3,6 @@ import { RevenueForm, FormData } from "@/components/RevenueForm";
 import { AnalysisPanel } from "@/components/AnalysisPanel";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
-import html2pdf from 'html2pdf.js';
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
@@ -28,9 +27,7 @@ const Index = () => {
           email,
           fields: {
             offer_desc: data.offer,
-            ppl_ask_help_with: data.helpRequests,
-            primary_revenue_from: data.revenueSource,
-            lead_magnet: "Fastest Path to Revenue",
+            lead_magnet: "Lead Magnet Generator",
             lead_magnet_link: pdfUrl
           }
         }
@@ -58,8 +55,6 @@ const Index = () => {
         .insert({
           email: data.email,
           offer: data.offer,
-          revenue_source: data.revenueSource,
-          help_requests: data.helpRequests,
         })
         .select()
         .single();
@@ -105,7 +100,7 @@ const Index = () => {
         if (element) {
           const pdf = await html2pdf().set({
             margin: 1,
-            filename: 'revenue-analysis.pdf',
+            filename: 'lead-magnet-ideas.pdf',
             image: { type: 'jpeg', quality: 0.95 },
             html2canvas: { 
               scale: 1.5,
@@ -141,7 +136,7 @@ const Index = () => {
       console.error('Error:', error);
       toast({
         title: "Error",
-        description: "Failed to generate analysis. Please try again.",
+        description: "Failed to generate lead magnet ideas. Please try again.",
         variant: "destructive",
       });
     } finally {
