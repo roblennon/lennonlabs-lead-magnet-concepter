@@ -1,6 +1,8 @@
 import { supabase } from "@/integrations/supabase/client";
 import { FormData } from "@/components/RevenueForm";
 
+const AI_CONFIG_ID = '57d00c58-41f4-49b7-a7a0-51e4bf7f50c2';
+
 export const generateAnalysis = async (data: FormData) => {
   // Save analysis to database
   const { data: savedAnalysis, error: dbError } = await supabase
@@ -16,13 +18,11 @@ export const generateAnalysis = async (data: FormData) => {
 
   if (dbError) throw dbError;
 
-  // Get AI configuration
+  // Get specific AI configuration
   const { data: aiConfig, error: configError } = await supabase
     .from('ai_configs')
     .select()
-    .eq('is_active', true)
-    .order('created_at', { ascending: false })
-    .limit(1)
+    .eq('id', AI_CONFIG_ID)
     .single();
 
   if (configError) throw configError;
