@@ -140,6 +140,8 @@ export type Database = {
           cta_body: string
           cta_button_text: string
           cta_heading: string
+          cta_text: string | null
+          deliverable_empty_state: string | null
           id: string
           page_slug: string
           sales_benefits: Json
@@ -147,6 +149,8 @@ export type Database = {
           sales_heading: string
           sales_image_url: string
           sales_intro: string
+          subtitle: string | null
+          title: string | null
           updated_at: string | null
         }
         Insert: {
@@ -154,6 +158,8 @@ export type Database = {
           cta_body: string
           cta_button_text: string
           cta_heading: string
+          cta_text?: string | null
+          deliverable_empty_state?: string | null
           id?: string
           page_slug: string
           sales_benefits: Json
@@ -161,6 +167,8 @@ export type Database = {
           sales_heading: string
           sales_image_url: string
           sales_intro: string
+          subtitle?: string | null
+          title?: string | null
           updated_at?: string | null
         }
         Update: {
@@ -168,6 +176,8 @@ export type Database = {
           cta_body?: string
           cta_button_text?: string
           cta_heading?: string
+          cta_text?: string | null
+          deliverable_empty_state?: string | null
           id?: string
           page_slug?: string
           sales_benefits?: Json
@@ -175,6 +185,8 @@ export type Database = {
           sales_heading?: string
           sales_image_url?: string
           sales_intro?: string
+          subtitle?: string | null
+          title?: string | null
           updated_at?: string | null
         }
         Relationships: []

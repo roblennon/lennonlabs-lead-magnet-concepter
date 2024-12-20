@@ -30,6 +30,10 @@ const SalesContent = () => {
           cta_heading: data.cta_heading,
           cta_body: data.cta_body,
           cta_button_text: data.cta_button_text,
+          title: data.title,
+          subtitle: data.subtitle,
+          cta_text: data.cta_text,
+          deliverable_empty_state: data.deliverable_empty_state,
         };
         setConfig(configWithParsedBenefits);
       }
