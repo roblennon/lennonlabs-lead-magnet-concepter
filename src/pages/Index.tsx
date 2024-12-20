@@ -6,7 +6,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { generateAnalysis } from "@/services/analysisService";
 import { subscribeToConvertKit } from "@/services/convertKitService";
-import { generateAndUploadPDF } from "@/utils/pdfGeneration";
+import { generateAndUploadPDF } from "@/services/pdfService";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -42,7 +42,7 @@ const Index = () => {
         try {
           const element = document.getElementById('analysis-content');
           if (element) {
-            const publicUrl = await generateAndUploadPDF(element, data);
+            const publicUrl = await generateAndUploadPDF(element, 'revenue-analysis');
             if (publicUrl) {
               await subscribeToConvertKit(data.email, data, publicUrl);
             }
@@ -71,7 +71,6 @@ const Index = () => {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       <Header />
-
       <main className="flex-1 container mx-auto px-4 sm:px-8 py-8">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-5 bg-card rounded-lg shadow-lg border border-border/30">
@@ -82,7 +81,6 @@ const Index = () => {
           </div>
         </div>
       </main>
-
       <Footer />
     </div>
   );

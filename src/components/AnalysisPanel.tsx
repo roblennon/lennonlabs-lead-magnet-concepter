@@ -3,7 +3,7 @@ import { Button } from "./ui/button";
 import { Copy, Download, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AnalysisContent } from "./AnalysisContent";
-import { generatePDF } from "@/utils/pdfUtils";
+import { generateAndUploadPDF } from "@/services/pdfService";
 
 interface AnalysisPanelProps {
   isLoading?: boolean;
@@ -37,7 +37,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
         description: "Please wait while we prepare your document",
       });
 
-      const publicUrl = await generatePDF(element, 'revenue-analysis');
+      const publicUrl = await generateAndUploadPDF(element, 'revenue-analysis');
 
       // Create temporary link and trigger download
       const link = document.createElement('a');
