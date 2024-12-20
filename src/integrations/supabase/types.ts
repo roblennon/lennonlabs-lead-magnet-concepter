@@ -134,6 +134,51 @@ export type Database = {
         }
         Relationships: []
       }
+      page_configs: {
+        Row: {
+          created_at: string | null
+          cta_body: string
+          cta_button_text: string
+          cta_heading: string
+          id: string
+          page_slug: string
+          sales_benefits: Json
+          sales_closing: string
+          sales_heading: string
+          sales_image_url: string
+          sales_intro: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          cta_body: string
+          cta_button_text: string
+          cta_heading: string
+          id?: string
+          page_slug: string
+          sales_benefits: Json
+          sales_closing: string
+          sales_heading: string
+          sales_image_url: string
+          sales_intro: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          cta_body?: string
+          cta_button_text?: string
+          cta_heading?: string
+          id?: string
+          page_slug?: string
+          sales_benefits?: Json
+          sales_closing?: string
+          sales_heading?: string
+          sales_image_url?: string
+          sales_intro?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       prompts: {
         Row: {
           content: string
