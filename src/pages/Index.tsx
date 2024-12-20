@@ -4,6 +4,7 @@ import { AnalysisPanel } from "@/components/AnalysisPanel";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
+import SalesContent from "@/components/layout/SalesContent";
 import { generateAnalysis } from "@/services/analysisService";
 import { subscribeToConvertKit } from "@/services/convertKitService";
 import { generateAndUploadPDF } from "@/services/pdf/pdfService";
@@ -81,6 +82,7 @@ const Index = () => {
           </div>
         </div>
       </main>
+      <SalesContent />
       <Footer />
     </div>
   );
