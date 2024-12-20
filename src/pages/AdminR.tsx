@@ -37,6 +37,10 @@ const AdminR = () => {
 
         const configData: PageConfig = {
           id: data.id,
+          title: data.title,
+          subtitle: data.subtitle,
+          cta_text: data.cta_text,
+          deliverable_empty_state: data.deliverable_empty_state,
           sales_heading: data.sales_heading,
           sales_intro: data.sales_intro,
           sales_benefits: benefits,
@@ -59,6 +63,10 @@ const AdminR = () => {
       const { error } = await supabase
         .from("page_configs")
         .update({
+          title: values.title,
+          subtitle: values.subtitle,
+          cta_text: values.cta_text,
+          deliverable_empty_state: values.deliverable_empty_state,
           sales_heading: values.sales_heading,
           sales_intro: values.sales_intro,
           sales_benefits: values.sales_benefits,
