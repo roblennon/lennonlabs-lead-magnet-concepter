@@ -4,8 +4,11 @@ import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
-import { AdminFormFields } from "@/components/admin/AdminFormFields";
 import { PageConfig } from "@/types/page-config";
+import { HeaderSection } from "@/components/admin/sections/HeaderSection";
+import { FormSection } from "@/components/admin/sections/FormSection";
+import { SalesSection } from "@/components/admin/sections/SalesSection";
+import { CTASection } from "@/components/admin/sections/CTASection";
 
 const AdminR = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -30,7 +33,6 @@ const AdminR = () => {
       }
 
       if (data) {
-        // Ensure sales_benefits is properly converted to string array
         const benefits = Array.isArray(data.sales_benefits) 
           ? data.sales_benefits.map(benefit => String(benefit))
           : [];
@@ -100,8 +102,18 @@ const AdminR = () => {
       <h1 className="text-2xl font-bold mb-8">Revenue Analyzer Configuration</h1>
       
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-2xl">
-          <AdminFormFields form={form} />
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <div className="space-y-8">
+              <HeaderSection form={form} />
+              <FormSection form={form} />
+            </div>
+            <div className="space-y-8">
+              <SalesSection form={form} />
+              <CTASection form={form} />
+            </div>
+          </div>
+          
           <Button type="submit" disabled={isLoading}>
             {isLoading ? "Saving..." : "Save Changes"}
           </Button>
