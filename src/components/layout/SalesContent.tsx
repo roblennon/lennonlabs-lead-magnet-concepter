@@ -10,33 +10,42 @@ const SalesContent = () => {
   useEffect(() => {
     // Initial fetch of config
     const fetchConfig = async () => {
-      const { data } = await supabase
-        .from("page_configs")
-        .select("*")
-        .eq("page_slug", "revenue-analyzer")
-        .single();
+      try {
+        const { data, error } = await supabase
+          .from("page_configs")
+          .select("*")
+          .eq("page_slug", "revenue-analyzer")
+          .single();
 
-      if (data) {
-        // Ensure sales_benefits is properly converted to string array
-        const benefits = Array.isArray(data.sales_benefits) 
-          ? data.sales_benefits.map(benefit => String(benefit))
-          : [];
+        if (error) {
+          console.error("Error fetching config:", error);
+          return;
+        }
 
-        const configWithParsedBenefits: PageConfig = {
-          sales_heading: data.sales_heading,
-          sales_intro: data.sales_intro,
-          sales_benefits: benefits,
-          sales_closing: data.sales_closing,
-          sales_image_url: data.sales_image_url,
-          cta_heading: data.cta_heading,
-          cta_body: data.cta_body,
-          cta_button_text: data.cta_button_text,
-          title: data.title,
-          subtitle: data.subtitle,
-          cta_text: data.cta_text,
-          deliverable_empty_state: data.deliverable_empty_state,
-        };
-        setConfig(configWithParsedBenefits);
+        if (data) {
+          // Ensure sales_benefits is properly converted to string array
+          const benefits = Array.isArray(data.sales_benefits) 
+            ? data.sales_benefits.map(benefit => String(benefit))
+            : [];
+
+          const configWithParsedBenefits: PageConfig = {
+            sales_heading: data.sales_heading,
+            sales_intro: data.sales_intro,
+            sales_benefits: benefits,
+            sales_closing: data.sales_closing,
+            sales_image_url: data.sales_image_url,
+            cta_heading: data.cta_heading,
+            cta_body: data.cta_body,
+            cta_button_text: data.cta_button_text,
+            title: data.title,
+            subtitle: data.subtitle,
+            cta_text: data.cta_text,
+            deliverable_empty_state: data.deliverable_empty_state,
+          };
+          setConfig(configWithParsedBenefits);
+        }
+      } catch (error) {
+        console.error("Failed to fetch config:", error);
       }
     };
 
@@ -53,8 +62,7 @@ const SalesContent = () => {
           table: 'page_configs',
           filter: `page_slug=eq.revenue-analyzer`
         },
-        async (payload) => {
-          // Refetch the config when changes occur
+        async () => {
           await fetchConfig();
         }
       )
