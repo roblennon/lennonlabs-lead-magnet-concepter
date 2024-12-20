@@ -8,6 +8,7 @@ const SalesContent = () => {
   const [config, setConfig] = useState<PageConfig | null>(null);
 
   useEffect(() => {
+    // Initial fetch of config
     const fetchConfig = async () => {
       const { data } = await supabase
         .from("page_configs")
@@ -40,6 +41,29 @@ const SalesContent = () => {
     };
 
     fetchConfig();
+
+    // Set up real-time subscription
+    const subscription = supabase
+      .channel('page_configs_changes')
+      .on(
+        'postgres_changes',
+        {
+          event: '*',
+          schema: 'public',
+          table: 'page_configs',
+          filter: `page_slug=eq.revenue-analyzer`
+        },
+        async (payload) => {
+          // Refetch the config when changes occur
+          await fetchConfig();
+        }
+      )
+      .subscribe();
+
+    // Cleanup subscription on unmount
+    return () => {
+      subscription.unsubscribe();
+    };
   }, []);
 
   if (!config) return null;
