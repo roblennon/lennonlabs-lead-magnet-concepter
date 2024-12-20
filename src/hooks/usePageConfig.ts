@@ -10,6 +10,7 @@ export const usePageConfig = (pageSlug: string) => {
   useEffect(() => {
     const fetchConfig = async () => {
       try {
+        console.log('Fetching config for page:', pageSlug);
         const { data, error } = await supabase
           .from("page_configs")
           .select("*")
@@ -27,6 +28,7 @@ export const usePageConfig = (pageSlug: string) => {
         }
 
         if (data) {
+          console.log('Received config data:', data);
           const benefits = Array.isArray(data.sales_benefits) 
             ? data.sales_benefits.map(benefit => String(benefit))
             : [];
@@ -59,12 +61,13 @@ export const usePageConfig = (pageSlug: string) => {
 
     fetchConfig();
 
+    // Set up real-time subscription with specific events
     const channel = supabase
       .channel('page_configs_changes')
       .on(
         'postgres_changes',
         {
-          event: '*',
+          event: 'UPDATE',
           schema: 'public',
           table: 'page_configs',
           filter: `page_slug=eq.${pageSlug}`
@@ -75,10 +78,11 @@ export const usePageConfig = (pageSlug: string) => {
         }
       )
       .subscribe((status) => {
-        console.log('Subscription status:', status);
+        console.log('Real-time subscription status:', status);
       });
 
     return () => {
+      console.log('Cleaning up subscription');
       channel.unsubscribe();
     };
   }, [pageSlug, toast]);
