@@ -64,7 +64,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
     return (
       <div className="flex items-center justify-center h-full bg-white text-gray-700 p-4 sm:p-8">
         <p className="text-center text-base font-inter">
-          Fill out the form to receive your personalized revenue opportunity analysis.
+          Fill out the form to get your lead magnet ideas.
         </p>
       </div>
     );
@@ -90,7 +90,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
             <Button
               variant="outline"
               size="sm"
-              className="text-sm"
+              className="text-sm text-[#8E9196] hover:text-[#6E7075]"
               onClick={copyToClipboard}
             >
               <Copy className="h-4 w-4 mr-1" />
@@ -99,7 +99,7 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
             <Button
               variant="outline"
               size="sm"
-              className="text-sm"
+              className="text-sm text-[#8E9196] hover:text-[#6E7075]"
               onClick={exportToPDF}
             >
               <Download className="h-4 w-4 mr-1" />

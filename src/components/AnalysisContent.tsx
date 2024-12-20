@@ -57,7 +57,7 @@ export function AnalysisContent({ content }: AnalysisContentProps) {
             alt="Lennon Labs Logo" 
             className="h-10 w-10"
           />
-          <span className="text-[#6E59A5] font-medium group-hover:text-[#7E69AB] transition-colors">
+          <span className="text-[rgb(61,59,69)] font-medium group-hover:text-[#7E69AB] transition-colors">
             Lennon Labs
           </span>
         </a>
