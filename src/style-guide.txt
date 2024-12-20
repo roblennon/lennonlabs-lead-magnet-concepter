@@ -1,0 +1,160 @@
+Design System & Style Guide
+==========================
+
+Color Palette
+------------
+Primary Colors:
+- Background: #1C1B20 (Dark gray with slight purple undertone)
+- Primary/Accent: #F1C40F (Bright gold)
+- Text: #FFFFFF (White)
+
+Secondary Colors:
+- Card Background: #2C2A30 (Slightly lighter dark gray)
+- Border Color: #3E3A45 (Medium gray)
+- Muted Text: #BDBDBD (Light gray)
+
+Interactive States:
+- Hover: 10% lighter than base color
+- Active: 10% darker than base color
+- Focus Ring: Primary color with 40% opacity
+
+Typography
+----------
+Font Family: Inter, sans-serif
+Import URL: https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap
+
+Text Styles:
+- H1 (Page Title): 
+  * Font-size: 2.5rem (40px)
+  * Font-weight: 700 (Bold)
+  * Color: Primary (#F1C40F)
+  * Line-height: 1.2
+
+- H2 (Section Headers):
+  * Font-size: 2rem (32px)
+  * Font-weight: 700 (Bold)
+  * Color: White
+  * Line-height: 1.3
+
+- Body Text:
+  * Font-size: 1rem (16px)
+  * Font-weight: 400 (Regular)
+  * Color: #BDBDBD
+  * Line-height: 1.5
+
+- Button Text:
+  * Font-size: 1rem (16px)
+  * Font-weight: 600 (Semi-bold)
+  * Text-transform: none
+
+Layout & Spacing
+---------------
+Container:
+- Max-width: 1280px
+- Padding: 2rem (32px)
+- Margin: 0 auto
+
+Spacing Scale:
+- xs: 0.5rem (8px)
+- sm: 1rem (16px)
+- md: 1.5rem (24px)
+- lg: 2rem (32px)
+- xl: 3rem (48px)
+- 2xl: 4rem (64px)
+
+Grid System:
+- 12-column grid
+- Gap: 2rem (32px)
+- Breakpoints:
+  * sm: 640px
+  * md: 768px
+  * lg: 1024px
+  * xl: 1280px
+  * 2xl: 1536px
+
+Components
+----------
+Cards:
+- Background: #2C2A30
+- Border: 1px solid rgba(62, 58, 69, 0.3)
+- Border-radius: 0.5rem (8px)
+- Box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1)
+- Padding: 1.5rem (24px)
+
+Buttons:
+- Primary:
+  * Background: #F1C40F
+  * Text: #000000
+  * Padding: 0.75rem 1.5rem
+  * Border-radius: 0.375rem (6px)
+  * Hover: Brightness 110%
+  * Transition: all 0.2s ease
+
+- Secondary:
+  * Background: transparent
+  * Border: 1px solid #F1C40F
+  * Text: #F1C40F
+  * Same padding/radius as primary
+
+Forms:
+- Input fields:
+  * Background: #2C2A30
+  * Border: 1px solid #3E3A45
+  * Border-radius: 0.375rem (6px)
+  * Padding: 0.75rem 1rem
+  * Focus: Ring color #F1C40F with 40% opacity
+
+Footer Specification
+-------------------
+Structure:
+- Background: #1C1B20
+- Border-top: 1px solid rgba(62, 58, 69, 0.3)
+- Padding: 1.5rem 0 (24px)
+
+Logo:
+- Size: 3.5rem (56px)
+- Margin-right: 1.5rem (24px)
+
+Text:
+- "Made with ❤️ by Rob Lennon"
+- Link: "lennonlabs.com"
+- Color: #BDBDBD (Muted)
+- Hover color on link: #F1C40F
+
+Layout:
+- Flex container with center alignment
+- Responsive: Stack on mobile, row on desktop
+- Space between items: 0.5rem (8px)
+- Container max-width: same as main content
+
+Animations & Transitions
+-----------------------
+- Hover transitions: 0.2s ease-in-out
+- Button hover: brightness adjustment
+- Link hover: color transition
+- Focus transitions: 0.2s ease
+
+Glass Effect (when needed):
+- Background: rgba(44, 42, 48, 0.7)
+- Backdrop-filter: blur(10px)
+- Border: 1px solid rgba(62, 58, 69, 0.3)
+
+Accessibility
+------------
+- Minimum contrast ratio: 4.5:1
+- Focus states must be visible
+- Interactive elements: minimum 44x44px touch target
+- Proper heading hierarchy
+- ARIA labels on interactive elements
+- Support for reduced motion preferences
+
+Best Practices
+-------------
+1. Use Tailwind CSS for styling
+2. Maintain responsive design principles
+3. Implement dark mode by default
+4. Use shadcn/ui components when available
+5. Maintain consistent spacing using the spacing scale
+6. Use semantic HTML elements
+7. Implement proper loading states
+8. Add hover/focus states for all interactive elements
