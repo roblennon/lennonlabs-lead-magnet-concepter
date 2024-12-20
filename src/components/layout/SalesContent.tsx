@@ -2,17 +2,7 @@ import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
-
-type PageConfig = {
-  sales_heading: string;
-  sales_intro: string;
-  sales_benefits: string[];
-  sales_closing: string;
-  sales_image_url: string;
-  cta_heading: string;
-  cta_body: string;
-  cta_button_text: string;
-};
+import { PageConfig } from "@/types/page-config";
 
 const SalesContent = () => {
   const [config, setConfig] = useState<PageConfig | null>(null);
@@ -26,13 +16,15 @@ const SalesContent = () => {
         .single();
 
       if (data) {
-        // Convert the JSON benefits to string array
+        // Ensure sales_benefits is properly converted to string array
+        const benefits = Array.isArray(data.sales_benefits) 
+          ? data.sales_benefits.map(benefit => String(benefit))
+          : [];
+
         const configWithParsedBenefits: PageConfig = {
           sales_heading: data.sales_heading,
           sales_intro: data.sales_intro,
-          sales_benefits: Array.isArray(data.sales_benefits) 
-            ? data.sales_benefits 
-            : [],
+          sales_benefits: benefits,
           sales_closing: data.sales_closing,
           sales_image_url: data.sales_image_url,
           cta_heading: data.cta_heading,
