@@ -5,20 +5,20 @@ export const typography = {
       h1: { 
         color: '#333333',
         fontSize: '2.25rem',
-        fontWeight: '700',
+        fontWeight: '800', // Made heavier
         lineHeight: '2.5rem',
         fontFamily: 'Inter, sans-serif',
         marginTop: '2rem',
-        marginBottom: '1rem'
+        marginBottom: '0.5rem' // Reduced spacing
       },
       h2: { 
         color: '#333333',
         fontSize: '1.875rem',
-        fontWeight: '600',
+        fontWeight: '700', // Made heavier
         lineHeight: '2.25rem',
         fontFamily: 'Inter, sans-serif',
         marginTop: '1.5rem',
-        marginBottom: '0rem'
+        marginBottom: '0.75rem'
       },
       h3: { 
         color: '#333333',
@@ -35,8 +35,8 @@ export const typography = {
         fontWeight: '600',
         lineHeight: '1.75rem',
         fontFamily: 'Inter, sans-serif',
-        marginTop: '1rem',
-        marginBottom: '0.5rem'
+        marginTop: '0.25rem', // Reduced spacing from h1
+        marginBottom: '1rem'
       },
       strong: { 
         color: '#333333',
@@ -55,6 +55,15 @@ export const typography = {
       },
       '--tw-prose-bullets': '#333333',
       '--tw-prose-counters': '#333333',
+      a: {
+        color: '#6E59A5',
+        textDecoration: 'none',
+        fontWeight: '500',
+        '&:hover': {
+          color: 'hsl(var(--primary))', // Matches the footer link hover state
+          transition: 'color 150ms ease'
+        }
+      }
     },
   },
 };
