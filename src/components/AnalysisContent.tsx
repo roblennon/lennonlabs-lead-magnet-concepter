@@ -26,16 +26,18 @@ export function AnalysisContent({ content }: AnalysisContentProps) {
         prose-li:text-[#333333]
         prose-li:mb-2
         prose-h1:text-4xl
-        prose-h1:mb-8
+        prose-h1:mb-2
         prose-h2:text-3xl
         prose-h2:mb-6
         prose-h3:text-2xl
         prose-h3:mb-4
         prose-strong:text-[#333333]
         prose-strong:font-semibold
-        prose-a:text-[#6E59A5]
+        prose-a:text-[#333333]
         prose-a:no-underline
-        prose-a:font-medium
+        prose-a:font-semibold
+        hover:prose-a:text-[#F1C40F]
+        prose-a:transition-colors
         [&>h3]:mt-8
         [&>p:first-of-type]:text-lg
         [&>p:first-of-type]:font-medium
@@ -57,7 +59,7 @@ export function AnalysisContent({ content }: AnalysisContentProps) {
             alt="Lennon Labs Logo" 
             className="h-10 w-10"
           />
-          <span className="text-[rgb(61,59,69)] font-medium group-hover:text-[#7E69AB] transition-colors">
+          <span className="text-[rgb(61,59,69)] font-medium group-hover:text-[#F1C40F] transition-colors">
             Lennon Labs
           </span>
         </a>
