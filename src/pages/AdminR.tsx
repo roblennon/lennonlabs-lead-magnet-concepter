@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { useToast } from "@/hooks/use-toast";
 import { supabase } from "@/integrations/supabase/client";
@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Form } from "@/components/ui/form";
 import { AdminFormFields } from "@/components/admin/AdminFormFields";
 import { PageConfig } from "@/types/page-config";
-import { useEffect } from "react";
 
 const AdminR = () => {
   const [isLoading, setIsLoading] = useState(false);
@@ -90,10 +89,10 @@ const AdminR = () => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <h1 className="text-2xl font-bold mb-8">Admin Configuration</h1>
+      <h1 className="text-2xl font-bold mb-8">Revenue Analyzer Configuration</h1>
       
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 max-w-2xl">
           <AdminFormFields form={form} />
           <Button type="submit" disabled={isLoading}>
             {isLoading ? "Saving..." : "Save Changes"}
