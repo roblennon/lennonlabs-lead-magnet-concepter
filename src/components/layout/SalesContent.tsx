@@ -3,12 +3,13 @@ import { Button } from "@/components/ui/button";
 import { ArrowRight } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageConfig } from "@/types/page-config";
+import { useToast } from "@/hooks/use-toast";
 
 const SalesContent = () => {
   const [config, setConfig] = useState<PageConfig | null>(null);
+  const { toast } = useToast();
 
   useEffect(() => {
-    // Initial fetch of config
     const fetchConfig = async () => {
       try {
         const { data, error } = await supabase
@@ -19,11 +20,15 @@ const SalesContent = () => {
 
         if (error) {
           console.error("Error fetching config:", error);
+          toast({
+            title: "Error",
+            description: "Failed to load page configuration",
+            variant: "destructive",
+          });
           return;
         }
 
         if (data) {
-          // Ensure sales_benefits is properly converted to string array
           const benefits = Array.isArray(data.sales_benefits) 
             ? data.sales_benefits.map(benefit => String(benefit))
             : [];
@@ -46,13 +51,19 @@ const SalesContent = () => {
         }
       } catch (error) {
         console.error("Failed to fetch config:", error);
+        toast({
+          title: "Error",
+          description: "Failed to load page configuration",
+          variant: "destructive",
+        });
       }
     };
 
+    // Initial fetch
     fetchConfig();
 
     // Set up real-time subscription
-    const subscription = supabase
+    const channel = supabase
       .channel('page_configs_changes')
       .on(
         'postgres_changes',
@@ -62,17 +73,20 @@ const SalesContent = () => {
           table: 'page_configs',
           filter: `page_slug=eq.revenue-analyzer`
         },
-        async () => {
-          await fetchConfig();
+        (payload) => {
+          console.log('Received real-time update:', payload);
+          fetchConfig();
         }
       )
-      .subscribe();
+      .subscribe((status) => {
+        console.log('Subscription status:', status);
+      });
 
     // Cleanup subscription on unmount
     return () => {
-      subscription.unsubscribe();
+      channel.unsubscribe();
     };
-  }, []);
+  }, [toast]);
 
   if (!config) return null;
 
