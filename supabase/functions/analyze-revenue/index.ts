@@ -19,51 +19,56 @@ const MODELS = [
 async function callOpenRouter(prompt: string, model: string) {
   console.log('Attempting to call OpenRouter with model:', model);
   
-  const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${Deno.env.get('OPENROUTER_API_KEY')}`,
-      'HTTP-Referer': 'https://lennonlabs.com',
-      'X-Title': 'Revenue Opportunity Finder',
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      model: model,
-      messages: [
-        {
-          role: "user",
-          content: prompt
-        }
-      ],
-      max_tokens: 4000,
-      temperature: 0.7
-    }),
-  });
-
-  if (!response.ok) {
-    const errorText = await response.text();
-    console.error(`OpenRouter API error for model ${model}:`, {
-      status: response.status,
-      statusText: response.statusText,
-      error: errorText
+  try {
+    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${Deno.env.get('OPENROUTER_API_KEY')}`,
+        'HTTP-Referer': 'https://lennonlabs.com',
+        'X-Title': 'Revenue Opportunity Finder',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        model: model,
+        messages: [
+          {
+            role: "user",
+            content: prompt
+          }
+        ],
+        max_tokens: 4000,
+        temperature: 0.7
+      }),
     });
-    throw new Error(`OpenRouter API error: ${response.status} ${errorText}`);
+
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error(`OpenRouter API error for model ${model}:`, {
+        status: response.status,
+        statusText: response.statusText,
+        error: errorText
+      });
+      throw new Error(`OpenRouter API error: ${response.status} ${errorText}`);
+    }
+
+    const result = await response.json();
+    console.log('OpenRouter response received for model:', model);
+
+    if (result.error) {
+      console.error(`Error from OpenRouter for model ${model}:`, result.error);
+      throw new Error(result.error.message || 'Unknown error from OpenRouter');
+    }
+
+    if (!result.choices?.[0]?.message?.content) {
+      console.error(`Invalid OpenRouter response structure for model ${model}:`, result);
+      throw new Error('No valid content in OpenRouter response');
+    }
+
+    return result.choices[0].message.content;
+  } catch (error) {
+    console.error(`Error in callOpenRouter for model ${model}:`, error);
+    throw error;
   }
-
-  const result = await response.json();
-  console.log('OpenRouter raw response:', result);
-
-  if (result.error) {
-    console.error(`Error from OpenRouter for model ${model}:`, result.error);
-    throw new Error(result.error.message || 'Unknown error from OpenRouter');
-  }
-
-  if (!result.choices?.[0]?.message?.content) {
-    console.error(`Invalid OpenRouter response structure for model ${model}:`, result);
-    throw new Error('No valid content in OpenRouter response');
-  }
-
-  return result.choices[0].message.content;
 }
 
 async function tryModelsSequentially(prompt: string): Promise<{ content: string, model: string }> {
@@ -78,11 +83,10 @@ async function tryModelsSequentially(prompt: string): Promise<{ content: string,
     } catch (error) {
       console.error(`Failed to use model ${model}:`, error);
       lastError = error;
-      continue; // Try next model
+      continue;
     }
   }
   
-  // If we get here, all models failed
   throw new Error(`All models failed. Last error: ${lastError?.message}`);
 }
 
@@ -97,7 +101,7 @@ serve(async (req) => {
 
   try {
     const { analysisId, prompt, data } = await req.json();
-    console.log('Raw request data:', { analysisId, prompt, data });
+    console.log('Received request with data:', { analysisId, prompt, data });
 
     if (!analysisId || !prompt || !data) {
       throw new Error('Missing required fields');
@@ -108,7 +112,7 @@ serve(async (req) => {
       .replace('{{revenueSource}}', data.revenueSource || '')
       .replace('{{helpRequests}}', data.helpRequests || '');
 
-    console.log('Formatted prompt with variables replaced:', formattedPrompt);
+    console.log('Formatted prompt:', formattedPrompt);
 
     // Try models sequentially until one succeeds
     const { content: analysisContent, model: successfulModel } = await tryModelsSequentially(formattedPrompt);
