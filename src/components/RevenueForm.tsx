@@ -48,10 +48,10 @@ export function RevenueForm({ onSubmit, isLoading, initialEmail }: RevenueFormPr
         if (error) throw error;
         
         if (data.content) {
-          // Update the form data with scraped content
+          // Update the form data with scraped content, adding URL, line break, and XML tags
           const updatedFormData = {
             ...formData,
-            offer: formData.offer + "\n\n" + data.content
+            offer: `${formData.offer}\n\n<website-content>\n${data.content}\n</website-content>`
           };
           setFormData(updatedFormData);
           
