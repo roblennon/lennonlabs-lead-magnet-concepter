@@ -26,7 +26,20 @@ const SalesContent = () => {
         .single();
 
       if (data) {
-        setConfig(data);
+        // Convert the JSON benefits to string array
+        const configWithParsedBenefits: PageConfig = {
+          sales_heading: data.sales_heading,
+          sales_intro: data.sales_intro,
+          sales_benefits: Array.isArray(data.sales_benefits) 
+            ? data.sales_benefits 
+            : [],
+          sales_closing: data.sales_closing,
+          sales_image_url: data.sales_image_url,
+          cta_heading: data.cta_heading,
+          cta_body: data.cta_body,
+          cta_button_text: data.cta_button_text,
+        };
+        setConfig(configWithParsedBenefits);
       }
     };
 

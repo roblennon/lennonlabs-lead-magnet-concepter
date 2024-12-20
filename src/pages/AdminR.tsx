@@ -48,7 +48,21 @@ const AdminR = () => {
       }
 
       if (data) {
-        form.reset(data);
+        // Convert the data to match PageConfig type
+        const configData: PageConfig = {
+          id: data.id,
+          sales_heading: data.sales_heading,
+          sales_intro: data.sales_intro,
+          sales_benefits: Array.isArray(data.sales_benefits) 
+            ? data.sales_benefits 
+            : [],
+          sales_closing: data.sales_closing,
+          sales_image_url: data.sales_image_url,
+          cta_heading: data.cta_heading,
+          cta_body: data.cta_body,
+          cta_button_text: data.cta_button_text,
+        };
+        form.reset(configData);
       }
     };
 
