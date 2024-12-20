@@ -2,6 +2,7 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
 import { PageConfig } from "@/types/page-config";
+import { ImageUploadField } from "./ImageUploadField";
 
 type AdminFormFieldsProps = {
   form: UseFormReturn<PageConfig>;
@@ -76,19 +77,7 @@ export const AdminFormFields = ({ form }: AdminFormFieldsProps) => {
         )}
       />
 
-      <FormField
-        control={form.control}
-        name="sales_image_url"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Sales Image URL</FormLabel>
-            <FormControl>
-              <Input {...field} />
-            </FormControl>
-            <FormMessage />
-          </FormItem>
-        )}
-      />
+      <ImageUploadField form={form} />
 
       <FormField
         control={form.control}
