@@ -1,92 +1,9 @@
-import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
-import { ArrowRight } from "lucide-react";
-import { supabase } from "@/integrations/supabase/client";
-import { PageConfig } from "@/types/page-config";
-import { useToast } from "@/hooks/use-toast";
+import { usePageConfig } from "@/hooks/usePageConfig";
+import { BenefitsList } from "./BenefitsList";
+import { CTASection } from "./CTASection";
 
 const SalesContent = () => {
-  const [config, setConfig] = useState<PageConfig | null>(null);
-  const { toast } = useToast();
-
-  useEffect(() => {
-    const fetchConfig = async () => {
-      try {
-        const { data, error } = await supabase
-          .from("page_configs")
-          .select("*")
-          .eq("page_slug", "revenue-analyzer")
-          .single();
-
-        if (error) {
-          console.error("Error fetching config:", error);
-          toast({
-            title: "Error",
-            description: "Failed to load page configuration",
-            variant: "destructive",
-          });
-          return;
-        }
-
-        if (data) {
-          const benefits = Array.isArray(data.sales_benefits) 
-            ? data.sales_benefits.map(benefit => String(benefit))
-            : [];
-
-          const configWithParsedBenefits: PageConfig = {
-            sales_heading: data.sales_heading,
-            sales_intro: data.sales_intro,
-            sales_benefits: benefits,
-            sales_closing: data.sales_closing,
-            sales_image_url: data.sales_image_url,
-            cta_heading: data.cta_heading,
-            cta_body: data.cta_body,
-            cta_button_text: data.cta_button_text,
-            title: data.title,
-            subtitle: data.subtitle,
-            cta_text: data.cta_text,
-            deliverable_empty_state: data.deliverable_empty_state,
-          };
-          setConfig(configWithParsedBenefits);
-        }
-      } catch (error) {
-        console.error("Failed to fetch config:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load page configuration",
-          variant: "destructive",
-        });
-      }
-    };
-
-    // Initial fetch
-    fetchConfig();
-
-    // Set up real-time subscription
-    const channel = supabase
-      .channel('page_configs_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: '*',
-          schema: 'public',
-          table: 'page_configs',
-          filter: `page_slug=eq.revenue-analyzer`
-        },
-        (payload) => {
-          console.log('Received real-time update:', payload);
-          fetchConfig();
-        }
-      )
-      .subscribe((status) => {
-        console.log('Subscription status:', status);
-      });
-
-    // Cleanup subscription on unmount
-    return () => {
-      channel.unsubscribe();
-    };
-  }, [toast]);
+  const config = usePageConfig("revenue-analyzer");
 
   if (!config) return null;
 
@@ -103,16 +20,7 @@ const SalesContent = () => {
               {config.sales_intro}
             </p>
             
-            <ul className="space-y-4">
-              {config.sales_benefits.map((benefit, index) => (
-                <li key={index} className="flex items-start space-x-3 text-muted-foreground">
-                  <svg className="h-6 w-6 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
-                  </svg>
-                  <span>{benefit}</span>
-                </li>
-              ))}
-            </ul>
+            <BenefitsList benefits={config.sales_benefits} />
             
             <p className="text-muted-foreground">
               {config.sales_closing}
@@ -130,19 +38,11 @@ const SalesContent = () => {
         </div>
       </section>
 
-      <section className="container mx-auto px-4 sm:px-8 py-16 sm:py-24 text-center">
-        <div className="max-w-2xl mx-auto space-y-6">
-          <h2 className="text-3xl sm:text-4xl font-bold">
-            {config.cta_heading}
-          </h2>
-          <p className="text-lg text-muted-foreground">
-            {config.cta_body}
-          </p>
-          <Button size="lg" className="mt-4">
-            {config.cta_button_text} <ArrowRight className="ml-2" />
-          </Button>
-        </div>
-      </section>
+      <CTASection 
+        heading={config.cta_heading}
+        body={config.cta_body}
+        buttonText={config.cta_button_text}
+      />
     </>
   );
 };
