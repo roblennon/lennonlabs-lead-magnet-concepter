@@ -3,7 +3,7 @@ import { Button } from "./ui/button";
 import { Copy, Download, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { AnalysisContent } from "./AnalysisContent";
-import { generateAndUploadPDF } from "@/services/pdfService";
+import { generateAndUploadPDF } from "@/services/pdf/pdfService";
 
 interface AnalysisPanelProps {
   isLoading?: boolean;

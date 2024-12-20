@@ -6,7 +6,7 @@ import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 import { generateAnalysis } from "@/services/analysisService";
 import { subscribeToConvertKit } from "@/services/convertKitService";
-import { generateAndUploadPDF } from "@/services/pdfService";
+import { generateAndUploadPDF } from "@/services/pdf/pdfService";
 
 const Index = () => {
   const [isLoading, setIsLoading] = useState(false);
