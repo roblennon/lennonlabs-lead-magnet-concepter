@@ -29,6 +29,7 @@ export function AnalysisContent({ content }: AnalysisContentProps) {
         prose-h1:mb-2
         prose-h2:text-3xl
         prose-h2:mb-6
+        prose-h2:mt-16
         prose-h3:text-2xl
         prose-h3:mb-4
         prose-strong:text-[#333333]
