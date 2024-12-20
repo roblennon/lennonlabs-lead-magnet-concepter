@@ -35,6 +35,8 @@ export function ActionButtons({ analysis }: ActionButtonsProps) {
       const link = document.createElement('a');
       link.href = publicUrl;
       link.download = 'revenue-analysis.pdf';
+      link.target = '_blank';
+      link.rel = 'noopener noreferrer';
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
