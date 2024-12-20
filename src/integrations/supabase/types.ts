@@ -141,6 +141,7 @@ export type Database = {
           cta_button_text: string
           cta_heading: string
           cta_text: string | null
+          cta_url: string | null
           deliverable_empty_state: string | null
           id: string
           page_slug: string
@@ -159,6 +160,7 @@ export type Database = {
           cta_button_text: string
           cta_heading: string
           cta_text?: string | null
+          cta_url?: string | null
           deliverable_empty_state?: string | null
           id?: string
           page_slug: string
@@ -177,6 +179,7 @@ export type Database = {
           cta_button_text?: string
           cta_heading?: string
           cta_text?: string | null
+          cta_url?: string | null
           deliverable_empty_state?: string | null
           id?: string
           page_slug?: string

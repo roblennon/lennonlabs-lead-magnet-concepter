@@ -8,6 +8,7 @@ export type PageConfig = {
   cta_heading: string;
   cta_body: string;
   cta_button_text: string;
+  cta_url: string;
   title: string;
   subtitle: string;
   cta_text: string;

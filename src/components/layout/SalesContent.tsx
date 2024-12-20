@@ -42,6 +42,7 @@ const SalesContent = () => {
         heading={config.cta_heading}
         body={config.cta_body}
         buttonText={config.cta_button_text}
+        url={config.cta_url}
       />
     </>
   );

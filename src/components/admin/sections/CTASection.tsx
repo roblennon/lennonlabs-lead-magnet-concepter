@@ -52,6 +52,20 @@ export const CTASection = ({ form }: CTASectionProps) => {
           </FormItem>
         )}
       />
+
+      <FormField
+        control={form.control}
+        name="cta_url"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>CTA URL</FormLabel>
+            <FormControl>
+              <Input type="url" placeholder="https://example.com" {...field} />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </div>
   );
 };
