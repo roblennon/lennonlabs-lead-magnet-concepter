@@ -45,14 +45,14 @@ export const SalesSection = ({ form }: SalesSectionProps) => {
         name="sales_benefits"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Sales Benefits (comma-separated)</FormLabel>
+            <FormLabel>Sales Benefits (semicolon-separated)</FormLabel>
             <FormControl>
               <Input 
                 {...field} 
-                value={field.value?.join(", ")} 
+                value={field.value?.join("; ")} 
                 onChange={(e) => {
                   const benefitsArray = e.target.value
-                    .split(",")
+                    .split(";")
                     .map(benefit => benefit.trim())
                     .filter(benefit => benefit !== "");
                   field.onChange(benefitsArray);
