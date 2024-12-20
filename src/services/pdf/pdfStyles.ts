@@ -3,54 +3,50 @@ export const pdfStyles = {
     padding: '15mm',
     maxWidth: '180mm',
     margin: '0 auto',
-    fontFamily: 'Arial, sans-serif',
+    fontFamily: 'Inter, sans-serif',
     fontSize: '12pt',
     lineHeight: '1.6',
-    color: '#000',
+    color: '#333333',
   },
-  headings: {
-    h1: {
-      fontSize: '24pt',
-      fontWeight: 'bold',
-      marginBottom: '20px',
-      color: '#000',
-      pageBreakAfter: 'avoid',
-    },
-    h2: {
-      fontSize: '18pt',
-      fontWeight: 'bold',
-      marginTop: '25px',
-      marginBottom: '15px',
-      color: '#000',
-      pageBreakAfter: 'avoid',
-    },
-    h3: {
-      fontSize: '16pt',
-      fontWeight: 'bold',
-      marginTop: '20px',
-      marginBottom: '10px',
-      color: '#000',
-      pageBreakAfter: 'avoid',
-    },
+  content: {
+    prose: `
+      prose 
+      prose-slate 
+      max-w-[180mm] 
+      mx-auto 
+      p-4 
+      sm:p-8 
+      font-inter 
+      prose-headings:text-[#333333] 
+      prose-headings:font-semibold 
+      prose-p:text-[#333333] 
+      prose-p:leading-relaxed 
+      prose-p:mb-4
+      prose-ul:list-disc 
+      prose-ul:ml-4 
+      prose-li:text-[#333333]
+      prose-li:mb-2
+      prose-h1:text-4xl
+      prose-h1:mb-8
+      prose-h2:text-3xl
+      prose-h2:mb-6
+      prose-h3:text-2xl
+      prose-h3:mb-4
+      prose-strong:text-[#333333]
+      prose-strong:font-semibold
+      prose-a:text-[#6E59A5]
+      prose-a:no-underline
+      prose-a:font-medium
+    `,
   },
-  text: {
-    paragraph: {
-      marginBottom: '12px',
-      fontSize: '12pt',
-      color: '#000',
-      pageBreakInside: 'avoid',
-    },
-    list: {
-      marginLeft: '20px',
-      marginBottom: '15px',
-      listStyleType: 'disc',
-      pageBreakInside: 'avoid',
-    },
-    listItem: {
-      marginBottom: '8px',
-      fontSize: '12pt',
-      color: '#000',
-    },
+  footer: {
+    marginTop: '16px',
+    paddingTop: '8px',
+    borderTop: '1px solid #e5e7eb',
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: '12px',
   },
 };
 
@@ -72,6 +68,5 @@ export const getPdfOptions = (filename: string) => ({
     orientation: 'portrait',
     compress: true,
     hotfixes: ['px_scaling'],
-    putTotalPages: true,
   },
 });

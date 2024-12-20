@@ -39,7 +39,6 @@ export function AnalysisPanel({ isLoading, analysis }: AnalysisPanelProps) {
 
       const publicUrl = await generateAndUploadPDF(element, 'revenue-analysis');
 
-      // Create temporary link and trigger download
       const link = document.createElement('a');
       link.href = publicUrl;
       link.download = 'revenue-analysis.pdf';
