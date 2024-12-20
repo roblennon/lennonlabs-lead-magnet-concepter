@@ -51,6 +51,7 @@ const AdminR = () => {
           cta_heading: data.cta_heading,
           cta_body: data.cta_body,
           cta_button_text: data.cta_button_text,
+          cta_url: data.cta_url,
         };
         form.reset(configData);
       }
@@ -77,6 +78,7 @@ const AdminR = () => {
           cta_heading: values.cta_heading,
           cta_body: values.cta_body,
           cta_button_text: values.cta_button_text,
+          cta_url: values.cta_url,
         })
         .eq("page_slug", "revenue-analyzer");
 

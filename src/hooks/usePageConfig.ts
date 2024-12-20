@@ -42,6 +42,7 @@ export const usePageConfig = (pageSlug: string) => {
             cta_heading: data.cta_heading,
             cta_body: data.cta_body,
             cta_button_text: data.cta_button_text,
+            cta_url: data.cta_url,
             title: data.title,
             subtitle: data.subtitle,
             cta_text: data.cta_text,
