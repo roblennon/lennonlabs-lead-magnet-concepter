@@ -1,45 +1,11 @@
-import { Link } from "react-router-dom";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-} from "@/components/ui/navigation-menu";
-
 const Header = () => {
   return (
-    <header className="border-b">
-      <div className="container mx-auto px-4 py-4">
-        <NavigationMenu>
-          <NavigationMenuList>
-            <NavigationMenuItem>
-              <Link to="/" className="text-lg font-semibold">
-                Revenue Analyzer
-              </Link>
-            </NavigationMenuItem>
-            <NavigationMenuItem>
-              <NavigationMenuTrigger>Menu</NavigationMenuTrigger>
-              <NavigationMenuContent>
-                <div className="w-[200px] p-2">
-                  <Link
-                    to="/"
-                    className="block px-4 py-2 hover:bg-accent rounded-md"
-                  >
-                    Home
-                  </Link>
-                  <Link
-                    to="/admin-r"
-                    className="block px-4 py-2 hover:bg-accent rounded-md"
-                  >
-                    Admin
-                  </Link>
-                </div>
-              </NavigationMenuContent>
-            </NavigationMenuItem>
-          </NavigationMenuList>
-        </NavigationMenu>
+    <header className="bg-[#1C1B20] border-b border-border/30">
+      <div className="container mx-auto px-8 py-12 text-center">
+        <h1 className="text-[2.5rem] font-bold text-primary mb-4">Generate Lead Magnet Ideas</h1>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          Drop in your website URL or describe your business, and we'll generate unique lead magnet ideas that will attract your ideal customers.
+        </p>
       </div>
     </header>
   );
