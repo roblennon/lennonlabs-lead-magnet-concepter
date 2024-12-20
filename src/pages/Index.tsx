@@ -39,10 +39,21 @@ const Index = () => {
       if (response?.content) {
         setAnalysis(response.content);
         
-        const element = document.getElementById('analysis-content');
-        if (element) {
-          const publicUrl = await generateAndUploadPDF(element, data);
-          await subscribeToConvertKit(data.email, data, publicUrl);
+        try {
+          const element = document.getElementById('analysis-content');
+          if (element) {
+            const publicUrl = await generateAndUploadPDF(element, data);
+            if (publicUrl) {
+              await subscribeToConvertKit(data.email, data, publicUrl);
+            }
+          }
+        } catch (pdfError) {
+          console.error('PDF/ConvertKit Error:', pdfError);
+          toast({
+            title: "PDF Generation Issue",
+            description: "Your analysis was generated but we couldn't create the PDF. Please try again.",
+            variant: "destructive",
+          });
         }
       }
     } catch (error) {

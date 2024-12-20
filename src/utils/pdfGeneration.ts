@@ -1,40 +1,51 @@
-import html2pdf from 'html2pdf.js';
-import { supabase } from "@/integrations/supabase/client";
+import html2canvas from 'html2canvas';
+import { jsPDF } from 'jspdf';
+import { supabase } from '@/integrations/supabase/client';
 
-export const generateAndUploadPDF = async (element: HTMLElement, data: any) => {
-  const timestamp = new Date().getTime();
-  const filename = `lead-magnet-ideas-${timestamp}.pdf`;
-  
-  const pdf = await html2pdf().set({
-    margin: 1,
-    filename: 'lead-magnet-ideas.pdf',
-    image: { type: 'jpeg', quality: 0.95 },
-    html2canvas: { 
-      scale: 1.5,
+export async function generateAndUploadPDF(element: HTMLElement, data: { email: string }) {
+  try {
+    // Generate canvas from HTML element
+    const canvas = await html2canvas(element, {
+      scale: 2,
       useCORS: true,
-      letterRendering: true
-    },
-    jsPDF: { 
-      unit: 'in', 
-      format: 'letter', 
-      orientation: 'portrait',
-      compress: true,
-      precision: 3
-    }
-  }).from(element).output('blob');
-
-  const { data: uploadData, error: uploadError } = await supabase.storage
-    .from('analysis-pdfs')
-    .upload(filename, pdf, {
-      contentType: 'application/pdf',
-      cacheControl: '15780000'
+      logging: false,
     });
 
-  if (uploadError) throw uploadError;
+    // Create PDF
+    const pdf = new jsPDF('p', 'mm', 'a4');
+    const imgData = canvas.toDataURL('image/png');
+    const pdfWidth = pdf.internal.pageSize.getWidth();
+    const pdfHeight = (canvas.height * pdfWidth) / canvas.width;
+    pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
 
-  const { data: { publicUrl } } = supabase.storage
-    .from('analysis-pdfs')
-    .getPublicUrl(filename);
+    // Convert PDF to Blob
+    const pdfBlob = pdf.output('blob');
 
-  return publicUrl;
-};
+    // Generate unique filename
+    const timestamp = new Date().getTime();
+    const filename = `lead-magnet-ideas-${timestamp}.pdf`;
+
+    // Upload to Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase
+      .storage
+      .from('analysis-pdfs')
+      .upload(filename, pdfBlob, {
+        contentType: 'application/pdf',
+        cacheControl: '3600',
+        upsert: false
+      });
+
+    if (uploadError) throw uploadError;
+
+    // Get public URL
+    const { data: publicUrlData } = await supabase
+      .storage
+      .from('analysis-pdfs')
+      .getPublicUrl(filename);
+
+    return publicUrlData.publicUrl;
+  } catch (error) {
+    console.error('Error generating/uploading PDF:', error);
+    throw error;
+  }
+}
