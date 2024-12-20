@@ -60,31 +60,6 @@ export const usePageConfig = (pageSlug: string) => {
     };
 
     fetchConfig();
-
-    // Set up real-time subscription with specific events
-    const channel = supabase
-      .channel('page_configs_changes')
-      .on(
-        'postgres_changes',
-        {
-          event: 'UPDATE',
-          schema: 'public',
-          table: 'page_configs',
-          filter: `page_slug=eq.${pageSlug}`
-        },
-        (payload) => {
-          console.log('Received real-time update:', payload);
-          fetchConfig();
-        }
-      )
-      .subscribe((status) => {
-        console.log('Real-time subscription status:', status);
-      });
-
-    return () => {
-      console.log('Cleaning up subscription');
-      channel.unsubscribe();
-    };
   }, [pageSlug, toast]);
 
   return config;
