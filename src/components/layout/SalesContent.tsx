@@ -4,7 +4,7 @@ const SalesContent = () => {
   return (
     <section className="container mx-auto px-4 sm:px-8 py-16 sm:py-24">
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-        <div className="space-y-6">
+        <div className="space-y-8 p-8 bg-card/30 rounded-xl min-h-[600px] flex flex-col justify-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-primary">
             Transform Your Website Into a Lead Generation Machine
           </h2>
@@ -13,7 +13,7 @@ const SalesContent = () => {
             Stop guessing what content will attract your ideal customers. Our AI-powered lead magnet generator analyzes your business and creates targeted content ideas that will grow your email list.
           </p>
           
-          <ul className="space-y-3">
+          <ul className="space-y-4">
             <li className="flex items-start space-x-3 text-muted-foreground">
               <svg className="h-6 w-6 text-primary flex-shrink-0" fill="none" viewBox="0 0 24 24" strokeWidth="2" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75 11.25 15 15 9.75M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" />
@@ -39,12 +39,12 @@ const SalesContent = () => {
           </p>
         </div>
         
-        <div className="relative">
+        <div className="relative h-[600px]">
           <div className="absolute -inset-4 bg-primary/5 rounded-xl -z-10" />
           <img
             src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"
             alt="Example lead magnet analysis"
-            className="rounded-lg shadow-xl w-full"
+            className="rounded-lg shadow-xl w-full h-full object-cover"
           />
         </div>
       </div>
