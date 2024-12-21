@@ -38,35 +38,43 @@ const Index = () => {
         });
       }
 
-      if (response?.content) {
-        console.log("Analysis generated successfully");
-        setAnalysis(response.content);
-        
-        try {
-          console.log("Starting PDF generation...");
-          const element = document.getElementById('analysis-content');
-          if (!element) {
-            throw new Error('Analysis content element not found');
-          }
+      if (!response?.content) {
+        throw new Error('No analysis content received from the server');
+      }
 
-          const publicUrl = await generateAndUploadPDF(element, 'revenue-analysis');
-          console.log("PDF generated and uploaded successfully:", publicUrl);
-          
-          if (publicUrl) {
-            console.log("Starting ConvertKit subscription process...");
-            const convertKitResponse = await subscribeToConvertKit(data.email, data, publicUrl);
-            console.log("ConvertKit subscription completed:", convertKitResponse);
-          } else {
-            throw new Error('PDF URL is empty or invalid');
-          }
-        } catch (pdfError) {
-          console.error('PDF/ConvertKit Error:', pdfError);
-          toast({
-            title: "PDF Generation Issue",
-            description: "Your analysis was generated but we couldn't create the PDF. Please try again.",
-            variant: "destructive",
-          });
+      console.log("Analysis generated successfully");
+      setAnalysis(response.content);
+      
+      // Wait for the analysis content to be rendered
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
+      try {
+        console.log("Starting PDF generation...");
+        const element = document.getElementById('analysis-content');
+        
+        if (!element) {
+          console.error('Analysis content element not found in DOM');
+          throw new Error('Analysis content element not found');
         }
+
+        const publicUrl = await generateAndUploadPDF(element, 'revenue-analysis');
+        console.log("PDF generated and uploaded successfully:", publicUrl);
+        
+        if (!publicUrl) {
+          throw new Error('PDF URL is empty or invalid');
+        }
+
+        console.log("Starting ConvertKit subscription process...");
+        const convertKitResponse = await subscribeToConvertKit(data.email, data, publicUrl);
+        console.log("ConvertKit subscription completed:", convertKitResponse);
+        
+      } catch (pdfError) {
+        console.error('PDF/ConvertKit Error:', pdfError);
+        toast({
+          title: "PDF Generation Issue",
+          description: "Your analysis was generated but we couldn't create the PDF. Please try again.",
+          variant: "destructive",
+        });
       }
     } catch (error) {
       console.error('Error:', error);
