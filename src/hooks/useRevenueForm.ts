@@ -26,6 +26,10 @@ export function useRevenueForm(onSubmit: (data: FormData) => void, initialEmail?
   };
 
   const processSubmission = async (data: FormData) => {
+    // First trigger the form submission to show loading state
+    onSubmit(data);
+
+    // Then handle URL scraping if needed
     if (isValidUrl(data.offer)) {
       try {
         const { data: scrapeData, error } = await supabase.functions.invoke('scrape-url', {
@@ -58,8 +62,6 @@ export function useRevenueForm(onSubmit: (data: FormData) => void, initialEmail?
         });
       }
     }
-    
-    onSubmit(data);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {

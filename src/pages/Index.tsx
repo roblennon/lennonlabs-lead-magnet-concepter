@@ -25,6 +25,7 @@ const Index = () => {
   }, []);
 
   const handleSubmit = async (data: FormData) => {
+    // Set loading state immediately
     setIsLoading(true);
     setAnalysis(undefined);
     
