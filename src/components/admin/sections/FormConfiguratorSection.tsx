@@ -2,85 +2,15 @@ import { UseFormReturn } from "react-hook-form";
 import { PageConfig } from "@/types/page-config";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
-import { FormFieldConfig } from "./form-configurator/FormFieldConfig";
-import { useState, useEffect } from "react";
-import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
+import { useFormFields } from "./form-configurator/hooks/useFormFields";
+import { FormFieldList } from "./form-configurator/components/FormFieldList";
 
 type FormConfiguratorSectionProps = {
   form: UseFormReturn<PageConfig>;
 };
 
 export const FormConfiguratorSection = ({ form }: FormConfiguratorSectionProps) => {
-  const [fields, setFields] = useState([
-    {
-      id: "1",
-      label: "Your website URL or business description",
-      placeholder: "e.g. website.com or tell us about your business, target audience, and what you currently offer",
-      type: "textarea",
-      required: true,
-      variableName: "businessDescription"
-    },
-    {
-      id: "2",
-      label: "Your email address",
-      placeholder: "Enter your email",
-      type: "email",
-      required: true,
-      isEmailField: true,
-      variableName: "email"
-    }
-  ]);
-
-  // Update form value when fields change
-  useEffect(() => {
-    form.setValue('form_fields', fields);
-  }, [fields, form]);
-
-  const addField = () => {
-    const newField = {
-      id: `field-${Date.now()}`,
-      label: "New Field",
-      placeholder: "Enter value",
-      type: "text",
-      required: false,
-      options: [],
-      hasOtherOption: false,
-      otherOptionPlaceholder: "",
-      variableName: `field_${Date.now()}`,
-      isEmailField: false
-    };
-    const emailFieldIndex = fields.findIndex(f => f.type === 'email');
-    const newFields = [...fields];
-    newFields.splice(emailFieldIndex, 0, newField);
-    setFields(newFields);
-  };
-
-  const updateField = (id: string, updates: any) => {
-    setFields(fields.map(field => 
-      field.id === id ? { ...field, ...updates } : field
-    ));
-  };
-
-  const deleteField = (id: string) => {
-    const field = fields.find(f => f.id === id);
-    if (field?.isEmailField) return;
-    setFields(fields.filter(field => field.id !== id));
-  };
-
-  const handleDragEnd = (result: any) => {
-    if (!result.destination) return;
-
-    const emailFieldIndex = fields.findIndex(f => f.type === 'email');
-    
-    if (result.destination.index >= emailFieldIndex) return;
-    if (fields[result.source.index].type === 'email') return;
-
-    const reorderedFields = Array.from(fields);
-    const [removed] = reorderedFields.splice(result.source.index, 1);
-    reorderedFields.splice(result.destination.index, 0, removed);
-    
-    setFields(reorderedFields);
-  };
+  const { fields, addField, updateField, deleteField } = useFormFields(form);
 
   return (
     <div className="space-y-6">
@@ -97,42 +27,12 @@ export const FormConfiguratorSection = ({ form }: FormConfiguratorSectionProps) 
         </Button>
       </div>
 
-      <DragDropContext onDragEnd={handleDragEnd}>
-        <Droppable droppableId="form-fields">
-          {(provided) => (
-            <div
-              {...provided.droppableProps}
-              ref={provided.innerRef}
-              className="space-y-4"
-            >
-              {fields.map((field, index) => (
-                <Draggable
-                  key={field.id}
-                  draggableId={field.id}
-                  index={index}
-                  isDragDisabled={field.type === 'email'}
-                >
-                  {(provided, snapshot) => (
-                    <div
-                      ref={provided.innerRef}
-                      {...provided.draggableProps}
-                      className={`${snapshot.isDragging ? 'opacity-50' : ''}`}
-                    >
-                      <FormFieldConfig
-                        field={field}
-                        onUpdate={(updates) => updateField(field.id, updates)}
-                        onDelete={() => deleteField(field.id)}
-                        dragHandleProps={provided.dragHandleProps}
-                      />
-                    </div>
-                  )}
-                </Draggable>
-              ))}
-              {provided.placeholder}
-            </div>
-          )}
-        </Droppable>
-      </DragDropContext>
+      <FormFieldList
+        fields={fields}
+        onFieldUpdate={updateField}
+        onFieldDelete={deleteField}
+        onFieldsReorder={(newFields) => form.setValue('form_fields', newFields)}
+      />
     </div>
   );
 };
