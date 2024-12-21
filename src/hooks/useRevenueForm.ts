@@ -25,21 +25,19 @@ export function useRevenueForm(onSubmit: (data: FormData) => void, initialEmail?
     return urlPattern.test(text.trim());
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (isValidUrl(formData.offer)) {
+  const processSubmission = async (data: FormData) => {
+    if (isValidUrl(data.offer)) {
       try {
-        const { data, error } = await supabase.functions.invoke('scrape-url', {
-          body: { url: formData.offer }
+        const { data: scrapeData, error } = await supabase.functions.invoke('scrape-url', {
+          body: { url: data.offer }
         });
 
         if (error) throw error;
         
-        if (data.content) {
+        if (scrapeData?.content) {
           const updatedFormData = {
-            ...formData,
-            offer: `${formData.offer}\n\n<website-content>\n${data.content}\n</website-content>`
+            ...data,
+            offer: `${data.offer}\n\n<website-content>\n${scrapeData.content}\n</website-content>`
           };
           setFormData(updatedFormData);
           
@@ -61,13 +59,18 @@ export function useRevenueForm(onSubmit: (data: FormData) => void, initialEmail?
       }
     }
     
-    onSubmit(formData);
+    onSubmit(data);
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    await processSubmission(formData);
+  };
+
+  const handleKeyPress = async (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && formData.email) {
       e.preventDefault();
-      handleSubmit(e as unknown as React.FormEvent);
+      await processSubmission(formData);
     }
   };
 
