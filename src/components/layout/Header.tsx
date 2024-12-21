@@ -5,6 +5,8 @@ const Header = () => {
 
   if (!config) return null;
 
+  console.log('Header config:', config); // Debug log
+
   return (
     <header className="bg-[#1C1B20] border-b border-border/30">
       <div className="container mx-auto px-4 py-12">
@@ -17,11 +19,23 @@ const Header = () => {
               </p>
             </div>
             <div className="flex justify-center">
-              <img 
-                src={config.header_image_url || "/lovable-uploads/d7c607b0-01bb-41b3-b067-b4ca4f2e97ab.png"}
-                alt="Example lead magnet concepts"
-                className="w-[300px] h-[300px] object-contain"
-              />
+              {config.header_image_url ? (
+                <img 
+                  src={config.header_image_url}
+                  alt="Header image"
+                  className="w-[300px] h-[300px] object-contain"
+                  onError={(e) => {
+                    console.error('Image load error:', e);
+                    e.currentTarget.src = "/lovable-uploads/d7c607b0-01bb-41b3-b067-b4ca4f2e97ab.png";
+                  }}
+                />
+              ) : (
+                <img 
+                  src="/lovable-uploads/d7c607b0-01bb-41b3-b067-b4ca4f2e97ab.png"
+                  alt="Example lead magnet concepts"
+                  className="w-[300px] h-[300px] object-contain"
+                />
+              )}
             </div>
           </div>
         </div>
