@@ -45,15 +45,19 @@ const Index = () => {
         try {
           console.log("Starting PDF generation...");
           const element = document.getElementById('analysis-content');
-          if (element) {
-            const publicUrl = await generateAndUploadPDF(element, 'revenue-analysis');
-            console.log("PDF generated and uploaded:", publicUrl);
-            
-            if (publicUrl) {
-              console.log("Subscribing to ConvertKit...");
-              const convertKitResponse = await subscribeToConvertKit(data.email, data, publicUrl);
-              console.log("ConvertKit subscription response:", convertKitResponse);
-            }
+          if (!element) {
+            throw new Error('Analysis content element not found');
+          }
+
+          const publicUrl = await generateAndUploadPDF(element, 'revenue-analysis');
+          console.log("PDF generated and uploaded successfully:", publicUrl);
+          
+          if (publicUrl) {
+            console.log("Starting ConvertKit subscription process...");
+            const convertKitResponse = await subscribeToConvertKit(data.email, data, publicUrl);
+            console.log("ConvertKit subscription completed:", convertKitResponse);
+          } else {
+            throw new Error('PDF URL is empty or invalid');
           }
         } catch (pdfError) {
           console.error('PDF/ConvertKit Error:', pdfError);
