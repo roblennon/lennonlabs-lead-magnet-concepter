@@ -136,6 +136,8 @@ export type Database = {
       }
       page_configs: {
         Row: {
+          convertkit_fields: Json | null
+          convertkit_form_id: string | null
           created_at: string | null
           cta_body: string
           cta_button_text: string
@@ -156,6 +158,8 @@ export type Database = {
           updated_at: string | null
         }
         Insert: {
+          convertkit_fields?: Json | null
+          convertkit_form_id?: string | null
           created_at?: string | null
           cta_body: string
           cta_button_text: string
@@ -176,6 +180,8 @@ export type Database = {
           updated_at?: string | null
         }
         Update: {
+          convertkit_fields?: Json | null
+          convertkit_form_id?: string | null
           created_at?: string | null
           cta_body?: string
           cta_button_text?: string

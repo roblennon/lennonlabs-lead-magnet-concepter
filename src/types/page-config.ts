@@ -14,4 +14,6 @@ export type PageConfig = {
   cta_text: string;
   deliverable_empty_state: string;
   header_image_url: string;
+  convertkit_form_id: string;
+  convertkit_fields: Record<string, string>;
 };

@@ -5,6 +5,7 @@ import { HeaderSection } from "./sections/HeaderSection";
 import { FormSection } from "./sections/FormSection";
 import { SalesSection } from "./sections/SalesSection";
 import { CTASection } from "./sections/CTASection";
+import { ConvertKitSection } from "./sections/ConvertKitSection";
 
 type AdminFormProps = {
   form: UseFormReturn<PageConfig>;
@@ -19,6 +20,7 @@ export const AdminForm = ({ form, onSubmit }: AdminFormProps) => {
           <div className="space-y-8">
             <HeaderSection form={form} />
             <FormSection form={form} />
+            <ConvertKitSection form={form} />
           </div>
           <div className="space-y-8">
             <SalesSection form={form} />
