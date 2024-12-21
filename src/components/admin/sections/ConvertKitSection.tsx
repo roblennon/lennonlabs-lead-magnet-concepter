@@ -14,6 +14,11 @@ type ConvertKitSectionProps = {
   form: UseFormReturn<PageConfig>;
 };
 
+const defaultConvertKitFields = {
+  lead_magnet: "",
+  lead_magnet_link: "",
+};
+
 export const ConvertKitSection = ({ form }: ConvertKitSectionProps) => {
   return (
     <div className="space-y-6">
@@ -43,33 +48,39 @@ export const ConvertKitSection = ({ form }: ConvertKitSectionProps) => {
       <FormField
         control={form.control}
         name="convertkit_fields"
-        render={({ field }) => (
-          <FormItem>
-            <FormLabel>Custom Fields</FormLabel>
-            <FormControl>
-              <Textarea
-                placeholder='{"field_name": "value"}'
-                className="min-h-[150px] font-mono"
-                {...field}
-                value={typeof field.value === 'string' 
-                  ? field.value 
-                  : JSON.stringify(field.value, null, 2)}
-                onChange={(e) => {
-                  try {
-                    const parsed = JSON.parse(e.target.value);
-                    field.onChange(parsed);
-                  } catch (error) {
-                    // Allow invalid JSON while typing
-                    field.onChange(e.target.value);
-                  }
-                }}
-              />
-            </FormControl>
-            <FormDescription>
-              Custom fields to send to ConvertKit (in JSON format)
-            </FormDescription>
-          </FormItem>
-        )}
+        render={({ field }) => {
+          // Initialize with default fields if empty
+          const currentValue = field.value && Object.keys(field.value).length > 0 
+            ? field.value 
+            : defaultConvertKitFields;
+
+          return (
+            <FormItem>
+              <FormLabel>Custom Fields</FormLabel>
+              <FormControl>
+                <Textarea
+                  placeholder='{"lead_magnet": "", "lead_magnet_link": ""}'
+                  className="min-h-[150px] font-mono"
+                  value={typeof currentValue === 'string' 
+                    ? currentValue 
+                    : JSON.stringify(currentValue, null, 2)}
+                  onChange={(e) => {
+                    try {
+                      const parsed = JSON.parse(e.target.value);
+                      field.onChange(parsed);
+                    } catch (error) {
+                      // Allow invalid JSON while typing
+                      field.onChange(e.target.value);
+                    }
+                  }}
+                />
+              </FormControl>
+              <FormDescription>
+                Custom fields to send to ConvertKit (in JSON format). Include lead_magnet and lead_magnet_link fields.
+              </FormDescription>
+            </FormItem>
+          );
+        }}
       />
     </div>
   );
