@@ -13,4 +13,5 @@ export type PageConfig = {
   subtitle: string;
   cta_text: string;
   deliverable_empty_state: string;
+  header_image_url: string;
 };
