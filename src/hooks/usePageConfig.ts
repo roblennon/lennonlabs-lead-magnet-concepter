@@ -1,38 +1,27 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { PageConfig } from "@/types/page-config";
-import { useToast } from "@/hooks/use-toast";
 
-export const usePageConfig = (pageSlug: string) => {
+export const usePageConfig = () => {
   const [config, setConfig] = useState<PageConfig | null>(null);
-  const { toast } = useToast();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchConfig = async () => {
       try {
-        console.log('Fetching config for page:', pageSlug);
         const { data, error } = await supabase
           .from("page_configs")
           .select("*")
-          .eq("page_slug", pageSlug)
-          .order('updated_at', { ascending: false })
-          .limit(1)
-          .maybeSingle();
+          .eq("page_slug", "revenue-analyzer")
+          .single();
 
         if (error) {
-          console.error("Error fetching config:", error);
-          toast({
-            title: "Error",
-            description: "Failed to load page configuration",
-            variant: "destructive",
-          });
-          return;
+          throw error;
         }
 
         if (data) {
-          console.log('Received config data:', data);
-          const benefits = Array.isArray(data.sales_benefits) 
-            ? data.sales_benefits.map(benefit => String(benefit))
+          const benefits = Array.isArray(data.sales_benefits)
+            ? data.sales_benefits.map((benefit) => String(benefit))
             : [];
 
           const configWithParsedBenefits: PageConfig = {
@@ -50,23 +39,22 @@ export const usePageConfig = (pageSlug: string) => {
             cta_text: data.cta_text,
             deliverable_empty_state: data.deliverable_empty_state,
             header_image_url: data.header_image_url,
-            convertkit_form_id: data.convertkit_form_id,
-            convertkit_fields: data.convertkit_fields || {},
+            convertkit_form_id: data.convertkit_form_id || "",
+            convertkit_fields: typeof data.convertkit_fields === 'object' 
+              ? data.convertkit_fields as Record<string, string>
+              : {},
           };
           setConfig(configWithParsedBenefits);
         }
       } catch (error) {
-        console.error("Failed to fetch config:", error);
-        toast({
-          title: "Error",
-          description: "Failed to load page configuration",
-          variant: "destructive",
-        });
+        console.error("Error fetching page config:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
 
     fetchConfig();
-  }, [pageSlug, toast]);
+  }, []);
 
-  return config;
+  return { config, isLoading };
 };

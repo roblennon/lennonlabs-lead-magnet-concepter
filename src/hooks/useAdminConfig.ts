@@ -46,8 +46,10 @@ export const useAdminConfig = () => {
         cta_body: data.cta_body,
         cta_button_text: data.cta_button_text,
         cta_url: data.cta_url,
-        convertkit_form_id: data.convertkit_form_id,
-        convertkit_fields: data.convertkit_fields || {},
+        convertkit_form_id: data.convertkit_form_id || "",
+        convertkit_fields: typeof data.convertkit_fields === 'object' 
+          ? data.convertkit_fields as Record<string, string>
+          : {},
       };
       form.reset(configData);
     }

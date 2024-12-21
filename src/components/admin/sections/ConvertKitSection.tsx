@@ -8,6 +8,7 @@ import {
   FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 
 type ConvertKitSectionProps = {
   form: UseFormReturn<PageConfig>;
@@ -46,10 +47,13 @@ export const ConvertKitSection = ({ form }: ConvertKitSectionProps) => {
           <FormItem>
             <FormLabel>Custom Fields</FormLabel>
             <FormControl>
-              <Input
+              <Textarea
                 placeholder='{"field_name": "value"}'
+                className="min-h-[150px] font-mono"
                 {...field}
-                value={JSON.stringify(field.value)}
+                value={typeof field.value === 'string' 
+                  ? field.value 
+                  : JSON.stringify(field.value, null, 2)}
                 onChange={(e) => {
                   try {
                     const parsed = JSON.parse(e.target.value);
