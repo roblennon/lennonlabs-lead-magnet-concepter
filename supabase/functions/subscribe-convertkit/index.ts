@@ -7,42 +7,33 @@ const corsHeaders = {
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
 };
 
-interface SubscribeRequest {
-  email: string;
-  fields: {
-    offer_desc?: string;
-    lead_magnet?: string;
-    lead_magnet_link?: string;
-    pdfUrl?: string;
-    [key: string]: string | undefined;
-  };
-}
-
 serve(async (req: Request) => {
+  console.log("Edge function booted", { time: new Date().toISOString() });
+
   // Handle CORS preflight requests
   if (req.method === "OPTIONS") {
+    console.log("Handling CORS preflight request");
     return new Response(null, { headers: corsHeaders });
   }
 
   try {
-    const { email, fields } = await req.json() as SubscribeRequest;
-    
     console.log("Starting ConvertKit subscription process");
+    
+    const { email, fields } = await req.json();
     console.log("Email:", email);
     console.log("Raw fields:", fields);
 
     // Get form ID from the request or use default
-    const FORM_ID = "7469655"; // Default form ID from page_configs
+    const FORM_ID = "7469655";
+    console.log("Sending to ConvertKit form ID:", FORM_ID);
 
-    // Replace the placeholder with the actual PDF link if it exists
+    // Process the fields before sending
     const processedFields = { ...fields };
     if (processedFields.lead_magnet_link === "{{deliverable_link}}" && fields.pdfUrl) {
       processedFields.lead_magnet_link = fields.pdfUrl;
       console.log("Replaced deliverable_link placeholder with:", fields.pdfUrl);
     }
-
     console.log("Processed fields:", processedFields);
-    console.log("Sending to ConvertKit form ID:", FORM_ID);
 
     const response = await fetch(
       `https://api.convertkit.com/v3/forms/${FORM_ID}/subscribe`,
@@ -60,6 +51,7 @@ serve(async (req: Request) => {
     );
 
     const data = await response.json();
+    console.log("ConvertKit API response:", data);
 
     if (!response.ok) {
       console.error("ConvertKit API error:", data);
