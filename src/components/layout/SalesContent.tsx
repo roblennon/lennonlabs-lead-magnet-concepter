@@ -3,9 +3,9 @@ import { BenefitsList } from "./BenefitsList";
 import { CTASection } from "./CTASection";
 
 const SalesContent = () => {
-  const config = usePageConfig("revenue-analyzer");
+  const { config, isLoading } = usePageConfig();
 
-  if (!config) return null;
+  if (isLoading || !config) return null;
 
   return (
     <>

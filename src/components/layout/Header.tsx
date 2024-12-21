@@ -1,9 +1,9 @@
 import { usePageConfig } from "@/hooks/usePageConfig";
 
 const Header = () => {
-  const config = usePageConfig("revenue-analyzer");
+  const { config, isLoading } = usePageConfig();
 
-  if (!config) return null;
+  if (isLoading || !config) return null;
 
   console.log('Header config:', config); // Debug log
 
