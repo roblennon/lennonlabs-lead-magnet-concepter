@@ -28,6 +28,7 @@ const Index = () => {
     setAnalysis(undefined);
     
     try {
+      console.log("Starting analysis generation...");
       const response = await generateAnalysis(data);
 
       if (response?.usingFallback) {
@@ -38,14 +39,20 @@ const Index = () => {
       }
 
       if (response?.content) {
+        console.log("Analysis generated successfully");
         setAnalysis(response.content);
         
         try {
+          console.log("Starting PDF generation...");
           const element = document.getElementById('analysis-content');
           if (element) {
             const publicUrl = await generateAndUploadPDF(element, 'revenue-analysis');
+            console.log("PDF generated and uploaded:", publicUrl);
+            
             if (publicUrl) {
-              await subscribeToConvertKit(data.email, data, publicUrl);
+              console.log("Subscribing to ConvertKit...");
+              const convertKitResponse = await subscribeToConvertKit(data.email, data, publicUrl);
+              console.log("ConvertKit subscription response:", convertKitResponse);
             }
           }
         } catch (pdfError) {
