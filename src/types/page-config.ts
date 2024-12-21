@@ -16,4 +16,16 @@ export type PageConfig = {
   header_image_url: string;
   convertkit_form_id: string;
   convertkit_fields: Record<string, string>;
+  form_fields?: Array<{
+    id: string;
+    label: string;
+    placeholder: string;
+    type: string;
+    required: boolean;
+    isEmailField?: boolean;
+    options?: Array<{ id: string; value: string }>;
+    hasOtherOption?: boolean;
+    otherOptionPlaceholder?: string;
+    variableName: string;
+  }>;
 };

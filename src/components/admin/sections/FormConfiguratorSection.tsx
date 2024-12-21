@@ -3,7 +3,7 @@ import { PageConfig } from "@/types/page-config";
 import { Button } from "@/components/ui/button";
 import { Plus } from "lucide-react";
 import { FormFieldConfig } from "./form-configurator/FormFieldConfig";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
 
 type FormConfiguratorSectionProps = {
@@ -31,6 +31,11 @@ export const FormConfiguratorSection = ({ form }: FormConfiguratorSectionProps) 
     }
   ]);
 
+  // Update form value when fields change
+  useEffect(() => {
+    form.setValue('form_fields', fields);
+  }, [fields, form]);
+
   const addField = () => {
     const newField = {
       id: `field-${Date.now()}`,
@@ -41,10 +46,9 @@ export const FormConfiguratorSection = ({ form }: FormConfiguratorSectionProps) 
       options: [],
       hasOtherOption: false,
       otherOptionPlaceholder: "",
-      variableName: `field_${Date.now()}`, // Add default variable name
+      variableName: `field_${Date.now()}`,
       isEmailField: false
     };
-    // Insert new field before the email field
     const emailFieldIndex = fields.findIndex(f => f.type === 'email');
     const newFields = [...fields];
     newFields.splice(emailFieldIndex, 0, newField);
@@ -58,7 +62,6 @@ export const FormConfiguratorSection = ({ form }: FormConfiguratorSectionProps) 
   };
 
   const deleteField = (id: string) => {
-    // Prevent deletion of email field
     const field = fields.find(f => f.id === id);
     if (field?.isEmailField) return;
     setFields(fields.filter(field => field.id !== id));
@@ -69,10 +72,7 @@ export const FormConfiguratorSection = ({ form }: FormConfiguratorSectionProps) 
 
     const emailFieldIndex = fields.findIndex(f => f.type === 'email');
     
-    // Prevent dropping after the email field
     if (result.destination.index >= emailFieldIndex) return;
-    
-    // Prevent dragging the email field
     if (fields[result.source.index].type === 'email') return;
 
     const reorderedFields = Array.from(fields);
