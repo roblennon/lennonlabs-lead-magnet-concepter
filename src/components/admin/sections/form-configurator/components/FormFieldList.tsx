@@ -1,5 +1,5 @@
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
-import { FormFieldConfig } from "./FormFieldConfig";
+import { FormFieldConfig } from "../FormFieldConfig";
 
 type FormField = {
   id: string;
