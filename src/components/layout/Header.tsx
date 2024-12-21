@@ -8,11 +8,11 @@ const Header = () => {
   return (
     <header className="bg-[#1C1B20] border-b border-border/30">
       <div className="container mx-auto px-4 py-12">
-        <div className="max-w-5xl mx-auto">
+        <div className="max-w-[90%] mx-auto">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-1 items-center">
-            <div className="text-left">
+            <div className="text-right">
               <h1 className="text-[2.5rem] font-bold text-primary mb-4">{config.title}</h1>
-              <p className="text-lg text-muted-foreground max-w-xl leading-relaxed">
+              <p className="text-lg text-muted-foreground max-w-xl ml-auto leading-relaxed">
                 {config.subtitle}
               </p>
             </div>
