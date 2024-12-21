@@ -45,19 +45,30 @@ const Index = () => {
       console.log("Analysis generated successfully");
       setAnalysis(response.content);
       
-      // Wait for the analysis content to be rendered
-      await new Promise(resolve => setTimeout(resolve, 100));
+      // Use a MutationObserver to wait for the analysis content to be fully rendered
+      const waitForElement = () => {
+        return new Promise((resolve) => {
+          const observer = new MutationObserver((mutations, obs) => {
+            const element = document.getElementById('analysis-content');
+            if (element) {
+              obs.disconnect();
+              resolve(element);
+            }
+          });
+
+          observer.observe(document.body, {
+            childList: true,
+            subtree: true
+          });
+        });
+      };
       
       try {
-        console.log("Starting PDF generation...");
-        const element = document.getElementById('analysis-content');
+        console.log("Waiting for analysis content to render...");
+        const element = await waitForElement();
+        console.log("Analysis content found in DOM, starting PDF generation...");
         
-        if (!element) {
-          console.error('Analysis content element not found in DOM');
-          throw new Error('Analysis content element not found');
-        }
-
-        const publicUrl = await generateAndUploadPDF(element, 'revenue-analysis');
+        const publicUrl = await generateAndUploadPDF(element as HTMLElement, 'revenue-analysis');
         console.log("PDF generated and uploaded successfully:", publicUrl);
         
         if (!publicUrl) {
