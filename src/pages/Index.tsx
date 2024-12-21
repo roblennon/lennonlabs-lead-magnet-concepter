@@ -1,5 +1,6 @@
 import { useState, useEffect } from "react";
-import { RevenueForm, FormData } from "@/components/RevenueForm";
+import { RevenueForm } from "@/components/RevenueForm";
+import { FormData } from "@/hooks/useRevenueForm";
 import { AnalysisPanel } from "@/components/AnalysisPanel";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/layout/Header";

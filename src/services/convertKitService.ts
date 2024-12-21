@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { FormData } from "@/components/RevenueForm";
+import { FormData } from "@/hooks/useRevenueForm";
 
 export const subscribeToConvertKit = async (email: string, data: FormData, pdfUrl: string) => {
   console.log("Calling ConvertKit subscription with:", { email, data, pdfUrl });

@@ -1,5 +1,5 @@
 import { supabase } from "@/integrations/supabase/client";
-import { FormData } from "@/components/RevenueForm";
+import { FormData } from "@/hooks/useRevenueForm";
 
 const AI_CONFIG_ID = '57d00c58-41f4-49b7-a7a0-51e4bf7f50c2';
 
