@@ -15,8 +15,8 @@ type ConvertKitSectionProps = {
 };
 
 const defaultConvertKitFields = {
-  lead_magnet: "",
-  lead_magnet_link: "",
+  lead_magnet: "5-min rapid results lead magnet",
+  lead_magnet_link: "{{deliverable_link}}"
 };
 
 export const ConvertKitSection = ({ form }: ConvertKitSectionProps) => {
@@ -59,7 +59,7 @@ export const ConvertKitSection = ({ form }: ConvertKitSectionProps) => {
               <FormLabel>Custom Fields</FormLabel>
               <FormControl>
                 <Textarea
-                  placeholder='{"lead_magnet": "", "lead_magnet_link": ""}'
+                  placeholder='{"lead_magnet": "5-min rapid results lead magnet", "lead_magnet_link": "{{deliverable_link}}"}'
                   className="min-h-[150px] font-mono"
                   value={typeof currentValue === 'string' 
                     ? currentValue 
@@ -76,7 +76,7 @@ export const ConvertKitSection = ({ form }: ConvertKitSectionProps) => {
                 />
               </FormControl>
               <FormDescription>
-                Custom fields to send to ConvertKit (in JSON format). Include lead_magnet and lead_magnet_link fields.
+                Custom fields to send to ConvertKit (in JSON format). The lead_magnet_link will be automatically populated with the generated PDF link.
               </FormDescription>
             </FormItem>
           );
