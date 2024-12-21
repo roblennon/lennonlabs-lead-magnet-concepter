@@ -18,6 +18,7 @@ export const FormConfiguratorSection = ({ form }: FormConfiguratorSectionProps) 
       placeholder: "e.g. website.com or tell us about your business, target audience, and what you currently offer",
       type: "textarea",
       required: true,
+      variableName: "businessDescription"
     },
     {
       id: "2",
@@ -26,6 +27,7 @@ export const FormConfiguratorSection = ({ form }: FormConfiguratorSectionProps) 
       type: "email",
       required: true,
       isEmailField: true,
+      variableName: "email"
     }
   ]);
 
