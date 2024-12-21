@@ -44,6 +44,7 @@ const Index = () => {
 
       console.log("Analysis generated successfully");
       setAnalysis(response.content);
+      setIsLoading(false); // Set loading to false after analysis is generated
       
       // Use a MutationObserver to wait for the analysis content to be fully rendered
       const waitForElement = () => {
@@ -89,13 +90,12 @@ const Index = () => {
       }
     } catch (error) {
       console.error('Error:', error);
+      setIsLoading(false); // Also ensure loading is set to false on error
       toast({
         title: "Error",
         description: "Failed to generate lead magnet ideas. Please try again.",
         variant: "destructive",
       });
-    } finally {
-      setIsLoading(false);
     }
   };
 
