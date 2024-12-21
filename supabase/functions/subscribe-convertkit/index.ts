@@ -1,7 +1,6 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const CONVERTKIT_API_KEY = Deno.env.get("CONVERTKIT_API_KEY");
-const FORM_ID = "7469655"; // ConvertKit form ID
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -31,6 +30,9 @@ serve(async (req: Request) => {
     console.log("Starting ConvertKit subscription process");
     console.log("Email:", email);
     console.log("Raw fields:", fields);
+
+    // Get form ID from the request or use default
+    const FORM_ID = "7469655"; // Default form ID from page_configs
 
     // Replace the placeholder with the actual PDF link if it exists
     const processedFields = { ...fields };
