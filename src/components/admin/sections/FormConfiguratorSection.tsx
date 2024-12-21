@@ -36,6 +36,9 @@ export const FormConfiguratorSection = ({ form }: FormConfiguratorSectionProps) 
       placeholder: "Enter value",
       type: "text",
       required: false,
+      options: [],
+      hasOtherOption: false,
+      otherOptionPlaceholder: "",
     };
     // Insert new field before the email field
     const emailFieldIndex = fields.findIndex(f => f.type === 'email');
