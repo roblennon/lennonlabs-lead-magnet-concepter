@@ -2,6 +2,7 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input";
 import { UseFormReturn } from "react-hook-form";
 import { PageConfig } from "@/types/page-config";
+import { HeaderImageUploadField } from "../HeaderImageUploadField";
 
 type HeaderSectionProps = {
   form: UseFormReturn<PageConfig>;
@@ -16,7 +17,7 @@ export const HeaderSection = ({ form }: HeaderSectionProps) => {
         name="title"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Page Title</FormLabel>
+            <FormLabel>Title</FormLabel>
             <FormControl>
               <Input {...field} />
             </FormControl>
@@ -30,7 +31,7 @@ export const HeaderSection = ({ form }: HeaderSectionProps) => {
         name="subtitle"
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Page Subtitle</FormLabel>
+            <FormLabel>Subtitle</FormLabel>
             <FormControl>
               <Input {...field} />
             </FormControl>
@@ -38,6 +39,8 @@ export const HeaderSection = ({ form }: HeaderSectionProps) => {
           </FormItem>
         )}
       />
+
+      <HeaderImageUploadField form={form} />
     </div>
   );
 };
