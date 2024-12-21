@@ -2,15 +2,10 @@ import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
 import { FieldHeader } from "./components/FieldHeader";
 import { OptionsConfig } from "./components/OptionsConfig";
+import { FieldTypeSelect } from "./components/FieldTypeSelect";
+import { VariableNameInput } from "./components/VariableNameInput";
 
 interface FormField {
   id: string;
@@ -66,48 +61,26 @@ export function FormFieldConfig({ field, onUpdate, onDelete, dragHandleProps }: 
           </div>
         )}
 
-        <div className="grid gap-2">
-          <Label htmlFor={`${field.id}-type`}>Field Type</Label>
-          <Select
-            value={field.type}
-            onValueChange={(value) => {
-              const updates: Partial<FormField> = { type: value };
-              if (value === 'radio' || value === 'multi-select') {
-                updates.options = field.options || [{ id: `option-${Date.now()}`, value: 'Option 1' }];
-                updates.hasOtherOption = false;
-              }
-              onUpdate(updates);
-            }}
-            disabled={field.isEmailField}
-          >
-            <SelectTrigger id={`${field.id}-type`}>
-              <SelectValue placeholder="Select field type" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="text">Short Text</SelectItem>
-              <SelectItem value="textarea">Long Text</SelectItem>
-              <SelectItem value="email">Email</SelectItem>
-              <SelectItem value="radio">Radio Buttons</SelectItem>
-              <SelectItem value="multi-select">Multi-Select</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        <FieldTypeSelect
+          id={field.id}
+          value={field.type}
+          onValueChange={(value) => {
+            const updates: Partial<FormField> = { type: value };
+            if (value === 'radio' || value === 'multi-select') {
+              updates.options = field.options || [{ id: `option-${Date.now()}`, value: 'Option 1' }];
+              updates.hasOtherOption = false;
+            }
+            onUpdate(updates);
+          }}
+          disabled={field.isEmailField}
+        />
 
-        <div className="grid gap-2">
-          <Label htmlFor={`${field.id}-variable`}>
-            Variable Name for AI Prompt
-            <span className="text-sm text-muted-foreground ml-2">
-              (Use {{variableName}} in your prompt)
-            </span>
-          </Label>
-          <Input
-            id={`${field.id}-variable`}
-            value={field.variableName}
-            onChange={(e) => onUpdate({ variableName: e.target.value })}
-            placeholder="e.g., businessDescription"
-            disabled={field.isEmailField}
-          />
-        </div>
+        <VariableNameInput
+          id={field.id}
+          value={field.variableName}
+          onChange={(value) => onUpdate({ variableName: value })}
+          disabled={field.isEmailField}
+        />
 
         {showOptionsConfig && !field.isEmailField && (
           <OptionsConfig
