@@ -50,6 +50,8 @@ export const usePageConfig = (pageSlug: string) => {
             cta_text: data.cta_text,
             deliverable_empty_state: data.deliverable_empty_state,
             header_image_url: data.header_image_url,
+            convertkit_form_id: data.convertkit_form_id,
+            convertkit_fields: data.convertkit_fields || {},
           };
           setConfig(configWithParsedBenefits);
         }

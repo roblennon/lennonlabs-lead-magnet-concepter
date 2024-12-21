@@ -46,6 +46,8 @@ export const useAdminConfig = () => {
         cta_body: data.cta_body,
         cta_button_text: data.cta_button_text,
         cta_url: data.cta_url,
+        convertkit_form_id: data.convertkit_form_id,
+        convertkit_fields: data.convertkit_fields || {},
       };
       form.reset(configData);
     }
@@ -71,6 +73,8 @@ export const useAdminConfig = () => {
           cta_body: values.cta_body,
           cta_button_text: values.cta_button_text,
           cta_url: values.cta_url,
+          convertkit_form_id: values.convertkit_form_id,
+          convertkit_fields: values.convertkit_fields,
         })
         .eq("page_slug", "revenue-analyzer");
 
