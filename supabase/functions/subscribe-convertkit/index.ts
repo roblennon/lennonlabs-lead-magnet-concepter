@@ -1,6 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
 const CONVERTKIT_API_KEY = Deno.env.get("CONVERTKIT_API_KEY");
+const FORM_ID = "7469655"; // ConvertKit form ID
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -13,6 +14,7 @@ interface SubscribeRequest {
     offer_desc?: string;
     lead_magnet?: string;
     lead_magnet_link?: string;
+    pdfUrl?: string;
     [key: string]: string | undefined;
   };
 }
@@ -26,16 +28,19 @@ serve(async (req: Request) => {
   try {
     const { email, fields } = await req.json() as SubscribeRequest;
     
-    console.log("Subscribing email to ConvertKit:", email);
-    console.log("Custom fields before processing:", fields);
+    console.log("Starting ConvertKit subscription process");
+    console.log("Email:", email);
+    console.log("Raw fields:", fields);
 
     // Replace the placeholder with the actual PDF link if it exists
     const processedFields = { ...fields };
     if (processedFields.lead_magnet_link === "{{deliverable_link}}" && fields.pdfUrl) {
       processedFields.lead_magnet_link = fields.pdfUrl;
+      console.log("Replaced deliverable_link placeholder with:", fields.pdfUrl);
     }
 
     console.log("Processed fields:", processedFields);
+    console.log("Sending to ConvertKit form ID:", FORM_ID);
 
     const response = await fetch(
       `https://api.convertkit.com/v3/forms/${FORM_ID}/subscribe`,
