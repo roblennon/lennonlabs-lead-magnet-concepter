@@ -29,6 +29,7 @@ const Index = () => {
     setAnalysis(undefined);
     
     try {
+      // Generate the analysis first
       const response = await generateAnalysis(data);
 
       if (response?.usingFallback) {
@@ -42,11 +43,21 @@ const Index = () => {
         setAnalysis(response.content);
         
         try {
+          // Generate and upload PDF
           const element = document.getElementById('analysis-content');
           if (element) {
+            console.log('Generating PDF for analysis...');
             const publicUrl = await generateAndUploadPDF(element, 'revenue-analysis');
+            
             if (publicUrl) {
+              console.log('PDF generated, subscribing to ConvertKit...', {
+                email: data.email,
+                pdfUrl: publicUrl
+              });
+              
+              // Subscribe to ConvertKit with the PDF URL
               await subscribeToConvertKit(data.email, data, publicUrl);
+              console.log('Successfully subscribed to ConvertKit');
             }
           }
         } catch (pdfError) {
