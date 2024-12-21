@@ -78,6 +78,13 @@ export function RevenueForm({ onSubmit, isLoading, initialEmail }: RevenueFormPr
     onSubmit(formData);
   };
 
+  const handleKeyPress = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter' && formData.email) {
+      e.preventDefault();
+      handleSubmit(e as unknown as React.FormEvent);
+    }
+  };
+
   return (
     <form onSubmit={handleSubmit} className="space-y-6 p-8">
       <OfferField
@@ -89,6 +96,7 @@ export function RevenueForm({ onSubmit, isLoading, initialEmail }: RevenueFormPr
         <EmailField 
           value={formData.email}
           onChange={(value) => setFormData(prev => ({ ...prev, email: value }))}
+          onKeyPress={handleKeyPress}
           required={true}
         />
       </div>
