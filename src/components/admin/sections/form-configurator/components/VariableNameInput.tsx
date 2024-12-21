@@ -14,7 +14,7 @@ export function VariableNameInput({ id, value, onChange, disabled }: VariableNam
       <Label htmlFor={`${id}-variable`}>
         Variable Name for AI Prompt
         <span className="text-sm text-muted-foreground ml-2">
-          (Use {{variableName}} in your prompt)
+          (Use {`{{${value}}}`} in your prompt)
         </span>
       </Label>
       <Input
