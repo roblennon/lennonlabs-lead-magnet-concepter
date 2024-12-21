@@ -14,7 +14,6 @@ interface SubscribeRequest {
     offer_desc?: string;
     lead_magnet?: string;
     lead_magnet_link?: string;
-    pdfUrl?: string;
     [key: string]: string | undefined;
   };
 }
@@ -30,17 +29,7 @@ serve(async (req: Request) => {
     
     console.log("Starting ConvertKit subscription process");
     console.log("Email:", email);
-    console.log("Raw fields:", fields);
-
-    // Replace the placeholder with the actual PDF link if it exists
-    const processedFields = { ...fields };
-    if (processedFields.lead_magnet_link === "{{deliverable_link}}" && fields.pdfUrl) {
-      processedFields.lead_magnet_link = fields.pdfUrl;
-      console.log("Replaced deliverable_link placeholder with:", fields.pdfUrl);
-    }
-
-    console.log("Processed fields:", processedFields);
-    console.log("Sending to ConvertKit form ID:", FORM_ID);
+    console.log("Fields:", fields);
 
     const response = await fetch(
       `https://api.convertkit.com/v3/forms/${FORM_ID}/subscribe`,
@@ -52,7 +41,10 @@ serve(async (req: Request) => {
         body: JSON.stringify({
           api_key: CONVERTKIT_API_KEY,
           email,
-          fields: processedFields,
+          fields: {
+            ...fields,
+            lead_magnet_link: fields.lead_magnet_link || "{{deliverable_link}}"
+          }
         }),
       }
     );

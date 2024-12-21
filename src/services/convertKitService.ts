@@ -10,8 +10,7 @@ export const subscribeToConvertKit = async (email: string, data: FormData, pdfUr
       fields: {
         offer_desc: data.offer,
         lead_magnet: "5-min rapid results lead magnet",
-        lead_magnet_link: "{{deliverable_link}}",
-        pdfUrl: pdfUrl
+        lead_magnet_link: pdfUrl
       }
     }
   });
