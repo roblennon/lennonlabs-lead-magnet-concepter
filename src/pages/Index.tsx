@@ -1,6 +1,5 @@
 import { useState, useEffect } from "react";
-import { RevenueForm } from "@/components/RevenueForm";
-import { FormData } from "@/hooks/useRevenueForm";
+import { RevenueForm, FormData } from "@/components/RevenueForm";
 import { AnalysisPanel } from "@/components/AnalysisPanel";
 import { useToast } from "@/hooks/use-toast";
 import Header from "@/components/layout/Header";
@@ -25,12 +24,10 @@ const Index = () => {
   }, []);
 
   const handleSubmit = async (data: FormData) => {
-    // Set loading state immediately
     setIsLoading(true);
     setAnalysis(undefined);
     
     try {
-      // Generate the analysis first
       const response = await generateAnalysis(data);
 
       if (response?.usingFallback) {
@@ -44,21 +41,11 @@ const Index = () => {
         setAnalysis(response.content);
         
         try {
-          // Generate and upload PDF
           const element = document.getElementById('analysis-content');
           if (element) {
-            console.log('Generating PDF for analysis...');
             const publicUrl = await generateAndUploadPDF(element, 'revenue-analysis');
-            
             if (publicUrl) {
-              console.log('PDF generated, subscribing to ConvertKit...', {
-                email: data.email,
-                pdfUrl: publicUrl
-              });
-              
-              // Subscribe to ConvertKit with the PDF URL
               await subscribeToConvertKit(data.email, data, publicUrl);
-              console.log('Successfully subscribed to ConvertKit');
             }
           }
         } catch (pdfError) {
