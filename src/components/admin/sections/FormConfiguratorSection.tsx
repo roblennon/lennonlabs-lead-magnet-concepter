@@ -1,7 +1,7 @@
 import { UseFormReturn } from "react-hook-form";
 import { PageConfig } from "@/types/page-config";
 import { Button } from "@/components/ui/button";
-import { Plus, Settings } from "lucide-react";
+import { Plus } from "lucide-react";
 import { FormFieldConfig } from "./form-configurator/FormFieldConfig";
 import { useState } from "react";
 import { DragDropContext, Droppable, Draggable } from "@hello-pangea/dnd";
@@ -41,6 +41,8 @@ export const FormConfiguratorSection = ({ form }: FormConfiguratorSectionProps) 
       options: [],
       hasOtherOption: false,
       otherOptionPlaceholder: "",
+      variableName: `field_${Date.now()}`, // Add default variable name
+      isEmailField: false
     };
     // Insert new field before the email field
     const emailFieldIndex = fields.findIndex(f => f.type === 'email');

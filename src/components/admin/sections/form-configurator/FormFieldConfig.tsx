@@ -12,20 +12,22 @@ import {
 import { FieldHeader } from "./components/FieldHeader";
 import { OptionsConfig } from "./components/OptionsConfig";
 
+interface FormField {
+  id: string;
+  label: string;
+  placeholder: string;
+  type: string;
+  required: boolean;
+  isEmailField?: boolean;
+  options?: Array<{ id: string; value: string }>;
+  hasOtherOption?: boolean;
+  otherOptionPlaceholder?: string;
+  variableName: string;
+}
+
 interface FormFieldConfigProps {
-  field: {
-    id: string;
-    label: string;
-    placeholder: string;
-    type: string;
-    required: boolean;
-    isEmailField?: boolean;
-    options?: Array<{ id: string; value: string }>;
-    hasOtherOption?: boolean;
-    otherOptionPlaceholder?: string;
-    variableName?: string;
-  };
-  onUpdate: (updates: any) => void;
+  field: FormField;
+  onUpdate: (updates: Partial<FormField>) => void;
   onDelete: () => void;
   dragHandleProps?: any;
 }
@@ -69,7 +71,7 @@ export function FormFieldConfig({ field, onUpdate, onDelete, dragHandleProps }: 
           <Select
             value={field.type}
             onValueChange={(value) => {
-              const updates: any = { type: value };
+              const updates: Partial<FormField> = { type: value };
               if (value === 'radio' || value === 'multi-select') {
                 updates.options = field.options || [{ id: `option-${Date.now()}`, value: 'Option 1' }];
                 updates.hasOtherOption = false;
@@ -100,7 +102,7 @@ export function FormFieldConfig({ field, onUpdate, onDelete, dragHandleProps }: 
           </Label>
           <Input
             id={`${field.id}-variable`}
-            value={field.variableName || ""}
+            value={field.variableName}
             onChange={(e) => onUpdate({ variableName: e.target.value })}
             placeholder="e.g., businessDescription"
             disabled={field.isEmailField}
