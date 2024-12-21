@@ -47,6 +47,7 @@ export const usePageConfig = (pageSlug: string) => {
             subtitle: data.subtitle,
             cta_text: data.cta_text,
             deliverable_empty_state: data.deliverable_empty_state,
+            header_image_url: data.header_image_url,
           };
           setConfig(configWithParsedBenefits);
         }
