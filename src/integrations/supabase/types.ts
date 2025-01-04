@@ -9,6 +9,42 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      agent_settings: {
+        Row: {
+          agent_name: string
+          base_prompt: string
+          chat_model: string
+          created_at: string | null
+          id: string
+          temperature: number
+          updated_at: string | null
+          voice_id: string
+          voice_model: string
+        }
+        Insert: {
+          agent_name?: string
+          base_prompt?: string
+          chat_model?: string
+          created_at?: string | null
+          id?: string
+          temperature?: number
+          updated_at?: string | null
+          voice_id?: string
+          voice_model?: string
+        }
+        Update: {
+          agent_name?: string
+          base_prompt?: string
+          chat_model?: string
+          created_at?: string | null
+          id?: string
+          temperature?: number
+          updated_at?: string | null
+          voice_id?: string
+          voice_model?: string
+        }
+        Relationships: []
+      }
       ai_configs: {
         Row: {
           created_at: string | null
@@ -38,6 +74,63 @@ export type Database = {
           name?: string
           prompt?: string
           temperature?: number
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      content_angles: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: string
+          is_active: boolean | null
+          name: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      content_types: {
+        Row: {
+          created_at: string | null
+          description: string
+          id: string
+          is_active: boolean | null
+          name: string
+          structure: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description: string
+          id?: string
+          is_active?: boolean | null
+          name: string
+          structure: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          structure?: string
           updated_at?: string | null
         }
         Relationships: []
@@ -89,6 +182,30 @@ export type Database = {
           },
         ]
       }
+      heartbeat_config: {
+        Row: {
+          api_key: string
+          base_url: string
+          created_at: string | null
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          api_key: string
+          base_url?: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          api_key?: string
+          base_url?: string
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
       invoice_requests: {
         Row: {
           business_address: string | null
@@ -131,6 +248,69 @@ export type Database = {
           vat_number?: string | null
           verification_token?: string
           verified_at?: string | null
+        }
+        Relationships: []
+      }
+      knowledge_base: {
+        Row: {
+          content: string
+          created_at: string | null
+          embedding: string | null
+          id: string
+          title: string
+          updated_at: string | null
+        }
+        Insert: {
+          content: string
+          created_at?: string | null
+          embedding?: string | null
+          id?: string
+          title: string
+          updated_at?: string | null
+        }
+        Update: {
+          content?: string
+          created_at?: string | null
+          embedding?: string | null
+          id?: string
+          title?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      monitored_posts: {
+        Row: {
+          created_at: string | null
+          id: string
+          is_active: boolean | null
+          lead_magnet_url: string
+          platform: string
+          post_url: string
+          trigger_word: string
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          lead_magnet_url: string
+          platform: string
+          post_url: string
+          trigger_word?: string
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          id?: string
+          is_active?: boolean | null
+          lead_magnet_url?: string
+          platform?: string
+          post_url?: string
+          trigger_word?: string
+          updated_at?: string | null
+          user_id?: string | null
         }
         Relationships: []
       }
@@ -206,6 +386,99 @@ export type Database = {
         }
         Relationships: []
       }
+      platform_connections: {
+        Row: {
+          access_token: string
+          created_at: string | null
+          expires_at: string | null
+          id: string
+          is_connected: boolean | null
+          message_count: number | null
+          platform: string
+          refresh_token: string | null
+          updated_at: string | null
+          user_id: string | null
+        }
+        Insert: {
+          access_token: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_connected?: boolean | null
+          message_count?: number | null
+          platform: string
+          refresh_token?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Update: {
+          access_token?: string
+          created_at?: string | null
+          expires_at?: string | null
+          id?: string
+          is_connected?: boolean | null
+          message_count?: number | null
+          platform?: string
+          refresh_token?: string | null
+          updated_at?: string | null
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      playground_settings: {
+        Row: {
+          created_at: string | null
+          default_max_tokens: number
+          default_model: string
+          default_system_prompt: string | null
+          default_temperature: number
+          id: string
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          default_max_tokens?: number
+          default_model?: string
+          default_system_prompt?: string | null
+          default_temperature?: number
+          id?: string
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          default_max_tokens?: number
+          default_model?: string
+          default_system_prompt?: string | null
+          default_temperature?: number
+          id?: string
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          avatar_url: string | null
+          created_at: string | null
+          id: string
+          updated_at: string | null
+          username: string | null
+        }
+        Insert: {
+          avatar_url?: string | null
+          created_at?: string | null
+          id: string
+          updated_at?: string | null
+          username?: string | null
+        }
+        Update: {
+          avatar_url?: string | null
+          created_at?: string | null
+          id?: string
+          updated_at?: string | null
+          username?: string | null
+        }
+        Relationships: []
+      }
       prompts: {
         Row: {
           content: string
@@ -274,12 +547,329 @@ export type Database = {
           },
         ]
       }
+      stripe_charges: {
+        Row: {
+          amount: number
+          billing_details: Json | null
+          created_at: string | null
+          currency: string
+          customer_email: string | null
+          id: string
+          metadata: Json | null
+          payment_intent_id: string | null
+          payment_method_details: Json | null
+          status: string
+          stripe_account_id: string
+          stripe_created_at: number
+          stripe_id: string
+        }
+        Insert: {
+          amount: number
+          billing_details?: Json | null
+          created_at?: string | null
+          currency: string
+          customer_email?: string | null
+          id?: string
+          metadata?: Json | null
+          payment_intent_id?: string | null
+          payment_method_details?: Json | null
+          status: string
+          stripe_account_id: string
+          stripe_created_at: number
+          stripe_id: string
+        }
+        Update: {
+          amount?: number
+          billing_details?: Json | null
+          created_at?: string | null
+          currency?: string
+          customer_email?: string | null
+          id?: string
+          metadata?: Json | null
+          payment_intent_id?: string | null
+          payment_method_details?: Json | null
+          status?: string
+          stripe_account_id?: string
+          stripe_created_at?: number
+          stripe_id?: string
+        }
+        Relationships: []
+      }
+      variable_settings: {
+        Row: {
+          audience: string | null
+          created_at: string | null
+          id: string
+          style: string | null
+          updated_at: string | null
+        }
+        Insert: {
+          audience?: string | null
+          created_at?: string | null
+          id?: string
+          style?: string | null
+          updated_at?: string | null
+        }
+        Update: {
+          audience?: string | null
+          created_at?: string | null
+          id?: string
+          style?: string | null
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
+      workflow_variables: {
+        Row: {
+          audience: string | null
+          created_at: string | null
+          id: string
+          style: string | null
+          updated_at: string | null
+          workflow_id: string
+        }
+        Insert: {
+          audience?: string | null
+          created_at?: string | null
+          id?: string
+          style?: string | null
+          updated_at?: string | null
+          workflow_id: string
+        }
+        Update: {
+          audience?: string | null
+          created_at?: string | null
+          id?: string
+          style?: string | null
+          updated_at?: string | null
+          workflow_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workflow_variables_workflow_id_fkey"
+            columns: ["workflow_id"]
+            isOneToOne: false
+            referencedRelation: "workflows"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      workflows: {
+        Row: {
+          created_at: string | null
+          description: string | null
+          edges: Json
+          id: string
+          is_active: boolean | null
+          name: string
+          nodes: Json
+          updated_at: string | null
+        }
+        Insert: {
+          created_at?: string | null
+          description?: string | null
+          edges: Json
+          id?: string
+          is_active?: boolean | null
+          name: string
+          nodes: Json
+          updated_at?: string | null
+        }
+        Update: {
+          created_at?: string | null
+          description?: string | null
+          edges?: Json
+          id?: string
+          is_active?: boolean | null
+          name?: string
+          nodes?: Json
+          updated_at?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      binary_quantize:
+        | {
+            Args: {
+              "": string
+            }
+            Returns: unknown
+          }
+        | {
+            Args: {
+              "": unknown
+            }
+            Returns: unknown
+          }
+      get_secret: {
+        Args: {
+          name: string
+        }
+        Returns: string
+      }
+      halfvec_avg: {
+        Args: {
+          "": number[]
+        }
+        Returns: unknown
+      }
+      halfvec_out: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      halfvec_send: {
+        Args: {
+          "": unknown
+        }
+        Returns: string
+      }
+      halfvec_typmod_in: {
+        Args: {
+          "": unknown[]
+        }
+        Returns: number
+      }
+      hnsw_bit_support: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      hnsw_halfvec_support: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      hnsw_sparsevec_support: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      hnswhandler: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      ivfflat_bit_support: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      ivfflat_halfvec_support: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      ivfflathandler: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      l2_norm:
+        | {
+            Args: {
+              "": unknown
+            }
+            Returns: number
+          }
+        | {
+            Args: {
+              "": unknown
+            }
+            Returns: number
+          }
+      l2_normalize:
+        | {
+            Args: {
+              "": string
+            }
+            Returns: string
+          }
+        | {
+            Args: {
+              "": unknown
+            }
+            Returns: unknown
+          }
+        | {
+            Args: {
+              "": unknown
+            }
+            Returns: unknown
+          }
+      sparsevec_out: {
+        Args: {
+          "": unknown
+        }
+        Returns: unknown
+      }
+      sparsevec_send: {
+        Args: {
+          "": unknown
+        }
+        Returns: string
+      }
+      sparsevec_typmod_in: {
+        Args: {
+          "": unknown[]
+        }
+        Returns: number
+      }
+      vector_avg: {
+        Args: {
+          "": number[]
+        }
+        Returns: string
+      }
+      vector_dims:
+        | {
+            Args: {
+              "": string
+            }
+            Returns: number
+          }
+        | {
+            Args: {
+              "": unknown
+            }
+            Returns: number
+          }
+      vector_norm: {
+        Args: {
+          "": string
+        }
+        Returns: number
+      }
+      vector_out: {
+        Args: {
+          "": string
+        }
+        Returns: unknown
+      }
+      vector_send: {
+        Args: {
+          "": string
+        }
+        Returns: string
+      }
+      vector_typmod_in: {
+        Args: {
+          "": unknown[]
+        }
+        Returns: number
+      }
     }
     Enums: {
       [_ in never]: never
