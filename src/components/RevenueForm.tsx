@@ -30,9 +30,23 @@ export function RevenueForm({ onSubmit, isLoading, initialEmail }: RevenueFormPr
     }
   }, [initialEmail]);
 
+  const normalizeUrl = (url: string): string => {
+    let normalizedUrl = url.trim();
+    // Add https:// if no protocol is specified
+    if (!/^https?:\/\//i.test(normalizedUrl)) {
+      normalizedUrl = `https://${normalizedUrl}`;
+    }
+    return normalizedUrl;
+  };
+
   const isValidUrl = (text: string): boolean => {
-    const urlPattern = /^(https?:\/\/)?[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)*\.[a-zA-Z]{2,}$/;
-    return urlPattern.test(text.trim());
+    try {
+      const normalizedUrl = normalizeUrl(text);
+      new URL(normalizedUrl);
+      return true;
+    } catch {
+      return false;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -41,17 +55,23 @@ export function RevenueForm({ onSubmit, isLoading, initialEmail }: RevenueFormPr
     // If it's a URL, scrape it first
     if (isValidUrl(formData.offer)) {
       try {
+        const normalizedUrl = normalizeUrl(formData.offer);
+        console.log("Scraping URL:", normalizedUrl);
+        
         const { data, error } = await supabase.functions.invoke('scrape-url', {
-          body: { url: formData.offer }
+          body: { url: normalizedUrl }
         });
 
-        if (error) throw error;
+        if (error) {
+          console.error('Scraping error:', error);
+          throw error;
+        }
         
-        if (data.content) {
+        if (data?.content) {
           // Update the form data with scraped content, adding URL, line break, and XML tags
           const updatedFormData = {
             ...formData,
-            offer: `${formData.offer}\n\n<website-content>\n${data.content}\n</website-content>`
+            offer: `${normalizedUrl}\n\n<website-content>\n${data.content}\n</website-content>`
           };
           setFormData(updatedFormData);
           
