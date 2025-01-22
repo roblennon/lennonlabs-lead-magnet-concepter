@@ -215,6 +215,7 @@ export type Database = {
           email: string
           format: string
           id: string
+          is_admin_request: boolean | null
           metadata: Json | null
           status: string
           vat_number: string | null
@@ -229,6 +230,7 @@ export type Database = {
           email: string
           format: string
           id?: string
+          is_admin_request?: boolean | null
           metadata?: Json | null
           status?: string
           vat_number?: string | null
@@ -243,6 +245,7 @@ export type Database = {
           email?: string
           format?: string
           id?: string
+          is_admin_request?: boolean | null
           metadata?: Json | null
           status?: string
           vat_number?: string | null
@@ -554,6 +557,7 @@ export type Database = {
           created_at: string | null
           currency: string
           customer_email: string | null
+          customer_id: string | null
           id: string
           metadata: Json | null
           payment_intent_id: string | null
@@ -569,6 +573,7 @@ export type Database = {
           created_at?: string | null
           currency: string
           customer_email?: string | null
+          customer_id?: string | null
           id?: string
           metadata?: Json | null
           payment_intent_id?: string | null
@@ -584,6 +589,7 @@ export type Database = {
           created_at?: string | null
           currency?: string
           customer_email?: string | null
+          customer_id?: string | null
           id?: string
           metadata?: Json | null
           payment_intent_id?: string | null
